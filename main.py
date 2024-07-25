@@ -7,6 +7,8 @@ from collections import Counter
 import csv
 import json
 import speech_recognition as sr
+from azure.ai.textanalytics import TextAnalyticsClient
+from azure.core.credentials import AzureKeyCredential
 
 # Download necessary NLTK data
 nltk.download('punkt', quiet=True)
@@ -15,12 +17,26 @@ nltk.download('stopwords', quiet=True)
 # Initialize speech recognizer
 recognizer = sr.Recognizer()
 
+# Azure AI Text Analytics credentials
+key = "YOUR_AZURE_KEY"
+endpoint = "YOUR_AZURE_ENDPOINT"
+
+# Initialize the Azure AI Text Analytics client
+text_analytics_client = TextAnalyticsClient(endpoint=endpoint, credential=AzureKeyCredential(key))
+
 # Database setup
 def setup_database():
     conn = sqlite3.connect('memory.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS memories
-                 (id INTEGER PRIMARY KEY, content TEXT, timestamp TEXT, category TEXT)''')
+                 (id INTEGER PRIMARY KEY, 
+                  content TEXT, 
+                  timestamp TEXT, 
+                  category TEXT, 
+                  sentiment TEXT,
+                  sentiment_scores TEXT,
+                  entities TEXT,
+                  key_phrases TEXT)''')
     conn.commit()
     conn.close()
 
@@ -49,16 +65,27 @@ def enhanced_categorize_text(text):
 def add_memory(content):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     category = enhanced_categorize_text(content)
+    
+    # Perform Azure AI analysis
+    sentiment, confidence = analyze_sentiment(content)
+    entities = recognize_entities(content)
+    key_phrases = extract_key_phrases(content)
+    
     conn = sqlite3.connect('memory.db')
     c = conn.cursor()
-    c.execute("INSERT INTO memories (content, timestamp, category) VALUES (?, ?, ?)",
-              (content, timestamp, category))
+    c.execute("""INSERT INTO memories 
+                 (content, timestamp, category, sentiment, sentiment_scores, entities, key_phrases) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?)""",
+              (content, timestamp, category, sentiment, 
+               json.dumps(confidence.__dict__), 
+               json.dumps(entities), 
+               json.dumps(key_phrases)))
     conn.commit()
     conn.close()
     return c.lastrowid
 
 # Enhanced retrieval function
-def retrieve_memories(keyword=None, category=None, start_date=None, end_date=None):
+def retrieve_memories(keyword=None, category=None, start_date=None, end_date=None, sentiment=None):
     conn = sqlite3.connect('memory.db')
     c = conn.cursor()
     
@@ -77,6 +104,9 @@ def retrieve_memories(keyword=None, category=None, start_date=None, end_date=Non
     if end_date:
         query += " AND timestamp <= ?"
         params.append(end_date)
+    if sentiment:
+        query += " AND sentiment = ?"
+        params.append(sentiment)
     
     query += " ORDER BY timestamp DESC"
     
@@ -104,6 +134,21 @@ def delete_memory(memory_id):
     conn.commit()
     conn.close()
     return c.rowcount > 0
+
+# Sentiment Analysis function
+def analyze_sentiment(text):
+    result = text_analytics_client.analyze_sentiment([text])[0]
+    return result.sentiment, result.confidence_scores
+
+# Named Entity Recognition function
+def recognize_entities(text):
+    result = text_analytics_client.recognize_entities([text])[0]
+    return [(entity.text, entity.category) for entity in result.entities]
+
+# Key Phrase Extraction function
+def extract_key_phrases(text):
+    result = text_analytics_client.extract_key_phrases([text])[0]
+    return result.key_phrases
 
 # Export memories function
 def export_memories(format='csv'):
@@ -181,11 +226,17 @@ def main():
             category = input("Enter a category to filter (or press enter for all): ")
             start_date = input("Enter start date (YYYY-MM-DD) or press enter to skip: ")
             end_date = input("Enter end date (YYYY-MM-DD) or press enter to skip: ")
+            sentiment = input("Enter sentiment to filter (positive/neutral/negative) or press enter to skip: ")
         
-            memories = retrieve_memories(keyword, category, start_date, end_date)
+            memories = retrieve_memories(keyword, category, start_date, end_date, sentiment)
             if memories:
                 for memory in memories:
-                    print(f"ID: {memory[0]}, [{memory[2]}] {memory[1]} (Category: {memory[3]})")
+                    print(f"ID: {memory[0]}, [{memory[2]}] {memory[1]}")
+                    print(f"Category: {memory[3]}")
+                    print(f"Sentiment: {memory[4]}")
+                    print(f"Key Phrases: {', '.join(json.loads(memory[7]))}")
+                    print(f"Entities: {', '.join([f'{e[0]} ({e[1]})' for e in json.loads(memory[6])])}")
+                    print("---")
             else:
                 print("No memories found matching the criteria.")
     
