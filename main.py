@@ -198,17 +198,19 @@ def export_memories(format='csv'):
 
 # Voice input function with automatic language detection using Azure
 def get_voice_input():
-    # Create a speech recognizer with auto language detection
-    auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(languages=["en-US", "es-ES", "fr-FR", "de-DE", "it-IT", "ja-JP", "ko-KR", "zh-CN"])
+    # Create a speech recognizer with auto language detection (limited to 4 languages)
+    auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(languages=["en-US", "es-ES", "fr-FR", "de-DE"])
+    audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
     speech_recognizer = speechsdk.SpeechRecognizer(
         speech_config=speech_config, 
-        auto_detect_source_language_config=auto_detect_source_language_config
+        auto_detect_source_language_config=auto_detect_source_language_config,
+        audio_config=audio_config
     )
 
-    print("Listening... Speak your memory in any language.")
+    print("Listening... Speak your memory in English, Spanish, French, or German.")
     
     # Start speech recognition
-    result = speech_recognizer.recognize_once()
+    result = speech_recognizer.recognize_once_async().get()
 
     # Check the result
     if result.reason == speechsdk.ResultReason.RecognizedSpeech:
