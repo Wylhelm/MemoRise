@@ -195,13 +195,17 @@ def export_memories(format='csv'):
     
     return filename
 
-# Voice input function
-def get_voice_input(language='en-US'):
+# Voice input function with automatic language detection
+def get_voice_input():
     with sr.Microphone() as source:
-        print(f"Listening... Speak your memory in {language}.")
+        print("Listening... Speak your memory in any language.")
         audio = recognizer.listen(source)
         try:
-            text = recognizer.recognize_google(audio, language=language)
+            # First, try to recognize without specifying a language
+            text = recognizer.recognize_google(audio)
+            # Then, detect the language of the recognized text
+            detected_language = detect_language(text)
+            print(f"Detected language: {detected_language[0]} ({detected_language[1]})")
             print("You said: " + text)
             return text
         except sr.UnknownValueError:
@@ -230,21 +234,7 @@ def main():
             print(f"Memory added successfully! ID: {memory_id}")
         
         elif choice == '2':
-            print("\nAvailable languages:")
-            print("1. English (en-US)")
-            print("2. Spanish (es-ES)")
-            print("3. French (fr-FR)")
-            print("4. German (de-DE)")
-            print("5. Italian (it-IT)")
-            print("6. Japanese (ja-JP)")
-            print("7. Korean (ko-KR)")
-            print("8. Chinese (Simplified) (zh-CN)")
-            
-            lang_choice = input("Select a language (1-8) or press enter for English: ")
-            lang_codes = ['en-US', 'es-ES', 'fr-FR', 'de-DE', 'it-IT', 'ja-JP', 'ko-KR', 'zh-CN']
-            lang_code = lang_codes[int(lang_choice) - 1] if lang_choice and lang_choice.isdigit() and 1 <= int(lang_choice) <= 8 else 'en-US'
-            
-            content = get_voice_input(lang_code)
+            content = get_voice_input()
             if content:
                 memory_id = add_memory(content)
                 print(f"Memory added successfully! ID: {memory_id}")
