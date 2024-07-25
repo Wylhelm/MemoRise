@@ -196,12 +196,12 @@ def export_memories(format='csv'):
     return filename
 
 # Voice input function
-def get_voice_input():
+def get_voice_input(language='en-US'):
     with sr.Microphone() as source:
-        print("Listening... Speak your memory.")
+        print(f"Listening... Speak your memory in {language}.")
         audio = recognizer.listen(source)
         try:
-            text = recognizer.recognize_google(audio)
+            text = recognizer.recognize_google(audio, language=language)
             print("You said: " + text)
             return text
         except sr.UnknownValueError:
@@ -230,7 +230,21 @@ def main():
             print(f"Memory added successfully! ID: {memory_id}")
         
         elif choice == '2':
-            content = get_voice_input()
+            print("\nAvailable languages:")
+            print("1. English (en-US)")
+            print("2. Spanish (es-ES)")
+            print("3. French (fr-FR)")
+            print("4. German (de-DE)")
+            print("5. Italian (it-IT)")
+            print("6. Japanese (ja-JP)")
+            print("7. Korean (ko-KR)")
+            print("8. Chinese (Simplified) (zh-CN)")
+            
+            lang_choice = input("Select a language (1-8) or press enter for English: ")
+            lang_codes = ['en-US', 'es-ES', 'fr-FR', 'de-DE', 'it-IT', 'ja-JP', 'ko-KR', 'zh-CN']
+            lang_code = lang_codes[int(lang_choice) - 1] if lang_choice and lang_choice.isdigit() and 1 <= int(lang_choice) <= 8 else 'en-US'
+            
+            content = get_voice_input(lang_code)
             if content:
                 memory_id = add_memory(content)
                 print(f"Memory added successfully! ID: {memory_id}")
