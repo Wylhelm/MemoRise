@@ -176,43 +176,43 @@ def main():
                 memory_id = add_memory(content)
                 print(f"Memory added successfully! ID: {memory_id}")
         
-        elif choice == '2':
+        elif choice == '3':
             keyword = input("Enter a keyword to search (or press enter for all): ")
             category = input("Enter a category to filter (or press enter for all): ")
             start_date = input("Enter start date (YYYY-MM-DD) or press enter to skip: ")
             end_date = input("Enter end date (YYYY-MM-DD) or press enter to skip: ")
-            
+        
             memories = retrieve_memories(keyword, category, start_date, end_date)
             if memories:
                 for memory in memories:
                     print(f"ID: {memory[0]}, [{memory[2]}] {memory[1]} (Category: {memory[3]})")
             else:
                 print("No memories found matching the criteria.")
-        
-        elif choice == '3':
+    
+        elif choice == '4':
             memory_id = input("Enter the ID of the memory to update: ")
             new_content = input("Enter the new content for the memory: ")
             if update_memory(memory_id, new_content):
                 print("Memory updated successfully!")
             else:
                 print("Failed to update memory. Please check the ID and try again.")
-        
-        elif choice == '4':
+    
+        elif choice == '5':
             memory_id = input("Enter the ID of the memory to delete: ")
             if delete_memory(memory_id):
                 print("Memory deleted successfully!")
             else:
                 print("Failed to delete memory. Please check the ID and try again.")
-        
-        elif choice == '5':
+    
+        elif choice == '6':
             format = input("Enter export format (csv/json): ").lower()
             try:
                 filename = export_memories(format)
                 print(f"Memories exported successfully to {filename}")
             except ValueError as e:
                 print(f"Export failed: {str(e)}")
-        
-        elif choice == '6':
+    
+        elif choice == '7':
             print("Thank you for using the Memory Augmentation App. Goodbye!")
             break
         
