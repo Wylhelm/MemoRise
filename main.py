@@ -9,6 +9,7 @@ import json
 import speech_recognition as sr
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.core.credentials import AzureKeyCredential
+from azure.ai.textanalytics import DetectLanguageInput
 
 # Download necessary NLTK data
 nltk.download('punkt', quiet=True)
@@ -36,7 +37,9 @@ def setup_database():
                   sentiment TEXT,
                   sentiment_scores TEXT,
                   entities TEXT,
-                  key_phrases TEXT)''')
+                  key_phrases TEXT,
+                  language TEXT,
+                  language_code TEXT)''')
     conn.commit()
     conn.close()
 
@@ -70,22 +73,25 @@ def add_memory(content):
     sentiment, confidence = analyze_sentiment(content)
     entities = recognize_entities(content)
     key_phrases = extract_key_phrases(content)
+    language, language_code = detect_language(content)
     
     conn = sqlite3.connect('memory.db')
     c = conn.cursor()
     c.execute("""INSERT INTO memories 
-                 (content, timestamp, category, sentiment, sentiment_scores, entities, key_phrases) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                 (content, timestamp, category, sentiment, sentiment_scores, entities, key_phrases, language, language_code) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
               (content, timestamp, category, sentiment, 
                json.dumps(confidence.__dict__), 
                json.dumps(entities), 
-               json.dumps(key_phrases)))
+               json.dumps(key_phrases),
+               language,
+               language_code))
     conn.commit()
     conn.close()
     return c.lastrowid
 
 # Enhanced retrieval function
-def retrieve_memories(keyword=None, category=None, start_date=None, end_date=None, sentiment=None):
+def retrieve_memories(keyword=None, category=None, start_date=None, end_date=None, sentiment=None, language=None):
     conn = sqlite3.connect('memory.db')
     c = conn.cursor()
     
@@ -107,6 +113,9 @@ def retrieve_memories(keyword=None, category=None, start_date=None, end_date=Non
     if sentiment:
         query += " AND sentiment = ?"
         params.append(sentiment)
+    if language:
+        query += " AND language = ?"
+        params.append(language)
     
     query += " ORDER BY timestamp DESC"
     
@@ -149,6 +158,11 @@ def recognize_entities(text):
 def extract_key_phrases(text):
     result = text_analytics_client.extract_key_phrases([text])[0]
     return result.key_phrases
+
+# Language Detection function
+def detect_language(text):
+    result = text_analytics_client.detect_language([text])[0]
+    return result.primary_language.name, result.primary_language.iso6391_name
 
 # Export memories function
 def export_memories(format='csv'):
@@ -227,13 +241,15 @@ def main():
             start_date = input("Enter start date (YYYY-MM-DD) or press enter to skip: ")
             end_date = input("Enter end date (YYYY-MM-DD) or press enter to skip: ")
             sentiment = input("Enter sentiment to filter (positive/neutral/negative) or press enter to skip: ")
+            language = input("Enter language to filter or press enter to skip: ")
         
-            memories = retrieve_memories(keyword, category, start_date, end_date, sentiment)
+            memories = retrieve_memories(keyword, category, start_date, end_date, sentiment, language)
             if memories:
                 for memory in memories:
                     print(f"ID: {memory[0]}, [{memory[2]}] {memory[1]}")
                     print(f"Category: {memory[3]}")
                     print(f"Sentiment: {memory[4]}")
+                    print(f"Language: {memory[8]} ({memory[9]})")
                     print(f"Key Phrases: {', '.join(json.loads(memory[7]))}")
                     print(f"Entities: {', '.join([f'{e[0]} ({e[1]})' for e in json.loads(memory[6])])}")
                     print("---")
