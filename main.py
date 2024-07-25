@@ -6,10 +6,9 @@ from nltk.tokenize import word_tokenize
 from collections import Counter
 import csv
 import json
-import speech_recognition as sr
+import azure.cognitiveservices.speech as speechsdk
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.core.credentials import AzureKeyCredential
-from azure.ai.textanalytics import DetectLanguageInput
 
 # Download necessary NLTK data
 nltk.download('punkt', quiet=True)
@@ -18,12 +17,17 @@ nltk.download('stopwords', quiet=True)
 # Initialize speech recognizer
 recognizer = sr.Recognizer()
 
-# Azure AI Text Analytics credentials
-key = "beb426be64af4d5181ecff4801816f72"
-endpoint = "https://pylanguage.cognitiveservices.azure.com/"
+# Azure AI credentials
+text_analytics_key = "beb426be64af4d5181ecff4801816f72"
+text_analytics_endpoint = "https://pylanguage.cognitiveservices.azure.com/"
+speech_key = "YOUR_AZURE_SPEECH_KEY"
+speech_region = "YOUR_AZURE_SPEECH_REGION"
 
 # Initialize the Azure AI Text Analytics client
-text_analytics_client = TextAnalyticsClient(endpoint=endpoint, credential=AzureKeyCredential(key))
+text_analytics_client = TextAnalyticsClient(endpoint=text_analytics_endpoint, credential=AzureKeyCredential(text_analytics_key))
+
+# Initialize the Azure AI Speech config
+speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
 
 # Database setup
 def setup_database():
@@ -195,25 +199,35 @@ def export_memories(format='csv'):
     
     return filename
 
-# Voice input function with automatic language detection
+# Voice input function with automatic language detection using Azure
 def get_voice_input():
-    with sr.Microphone() as source:
-        print("Listening... Speak your memory in any language.")
-        audio = recognizer.listen(source)
-        try:
-            # First, try to recognize without specifying a language
-            text = recognizer.recognize_google(audio)
-            # Then, detect the language of the recognized text
-            detected_language = detect_language(text)
-            print(f"Detected language: {detected_language[0]} ({detected_language[1]})")
-            print("You said: " + text)
-            return text
-        except sr.UnknownValueError:
-            print("Sorry, I couldn't understand that.")
-            return None
-        except sr.RequestError:
-            print("Sorry, there was an error connecting to the speech recognition service.")
-            return None
+    # Create a speech recognizer with auto language detection
+    auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(languages=["en-US", "es-ES", "fr-FR", "de-DE", "it-IT", "ja-JP", "ko-KR", "zh-CN"])
+    speech_recognizer = speechsdk.SpeechRecognizer(
+        speech_config=speech_config, 
+        auto_detect_source_language_config=auto_detect_source_language_config
+    )
+
+    print("Listening... Speak your memory in any language.")
+    
+    # Start speech recognition
+    result = speech_recognizer.recognize_once()
+
+    # Check the result
+    if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+        detected_language = result.properties.get(speechsdk.PropertyId.SpeechServiceConnection_AutoDetectSourceLanguageResult)
+        print(f"Detected language: {detected_language}")
+        print("You said: " + result.text)
+        return result.text
+    elif result.reason == speechsdk.ResultReason.NoMatch:
+        print("No speech could be recognized")
+    elif result.reason == speechsdk.ResultReason.Canceled:
+        cancellation_details = result.cancellation_details
+        print(f"Speech recognition canceled: {cancellation_details.reason}")
+        if cancellation_details.reason == speechsdk.CancellationReason.Error:
+            print(f"Error details: {cancellation_details.error_details}")
+
+    return None
 
 # Main command-line interface
 def main():
