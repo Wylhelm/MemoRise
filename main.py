@@ -6,10 +6,14 @@ from nltk.tokenize import word_tokenize
 from collections import Counter
 import csv
 import json
+import speech_recognition as sr
 
 # Download necessary NLTK data
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
+
+# Initialize speech recognizer
+recognizer = sr.Recognizer()
 
 # Database setup
 def setup_database():
@@ -132,22 +136,45 @@ def export_memories(format='csv'):
     
     return filename
 
+# Voice input function
+def get_voice_input():
+    with sr.Microphone() as source:
+        print("Listening... Speak your memory.")
+        audio = recognizer.listen(source)
+        try:
+            text = recognizer.recognize_google(audio)
+            print("You said: " + text)
+            return text
+        except sr.UnknownValueError:
+            print("Sorry, I couldn't understand that.")
+            return None
+        except sr.RequestError:
+            print("Sorry, there was an error connecting to the speech recognition service.")
+            return None
+
 # Main command-line interface
 def main():
     setup_database()
     while True:
-        print("\n1. Add a new memory")
-        print("2. Retrieve memories")
-        print("3. Update a memory")
-        print("4. Delete a memory")
-        print("5. Export memories")
-        print("6. Exit")
+        print("\n1. Add a new memory (text)")
+        print("2. Add a new memory (voice)")
+        print("3. Retrieve memories")
+        print("4. Update a memory")
+        print("5. Delete a memory")
+        print("6. Export memories")
+        print("7. Exit")
         choice = input("Enter your choice: ")
         
         if choice == '1':
             content = input("Enter your memory: ")
             memory_id = add_memory(content)
             print(f"Memory added successfully! ID: {memory_id}")
+        
+        elif choice == '2':
+            content = get_voice_input()
+            if content:
+                memory_id = add_memory(content)
+                print(f"Memory added successfully! ID: {memory_id}")
         
         elif choice == '2':
             keyword = input("Enter a keyword to search (or press enter for all): ")
