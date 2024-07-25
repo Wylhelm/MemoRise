@@ -18,8 +18,8 @@ nltk.download('stopwords', quiet=True)
 recognizer = sr.Recognizer()
 
 # Azure AI Text Analytics credentials
-key = "YOUR_AZURE_KEY"
-endpoint = "YOUR_AZURE_ENDPOINT"
+key = "beb426be64af4d5181ecff4801816f72"
+endpoint = "https://pylanguage.cognitiveservices.azure.com/"
 
 # Initialize the Azure AI Text Analytics client
 text_analytics_client = TextAnalyticsClient(endpoint=endpoint, credential=AzureKeyCredential(key))
