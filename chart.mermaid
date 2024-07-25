@@ -1,35 +1,30 @@
 graph TD
-    A[User Interaction] --> B{Input Type?}
-    B -->|Text| C[Text Input]
-    B -->|Voice| D[Voice Input]
-    B -->|Image| E[Image Input]
-    B -->|Video| F[Video Input]
-    
-    C --> G[NLP Processing]
-    D --> H[Speech-to-Text Conversion]
-    E --> I[Image Recognition]
-    F --> J[Video Analysis]
-    
-    H --> G
-    I --> G
-    J --> G
-    
-    G --> K[Information Categorization]
-    K --> L[Store in Database]
-    
-    M[External Systems] -->|Sync| L
-    M -->|Agenda| M1[Calendar Events]
-    M -->|Email| M2[Related Emails]
-    
-    L --> N{User Query}
-    N -->|Retrieval Request| O[Search Database]
-    O --> P[Apply RAG]
-    P --> Q[Generate Response]
-    Q --> R[Present to User]
-    
-    R --> S{User Satisfied?}
-    S -->|Yes| T[End Process]
-    S -->|No| N
-    
-    U[Continuous Learning] --> G
-    U --> O
+    A[Main Dashboard] --> B[Memory Management]
+    A --> C[Reminder System]
+    A --> D[Analytics]
+    A --> E[Settings]
+
+    B --> B1[Add Memory]
+    B --> B2[Search/Retrieve Memories]
+    B --> B3[Edit/Delete Memory]
+
+    C --> C1[View All Reminders]
+    C --> C2[Add New Reminder]
+    C --> C3[Edit/Delete Reminder]
+
+    D --> D1[Sentiment Analysis]
+    D --> D2[Category Distribution]
+    D --> D3[Language Usage]
+
+    E --> E1[User Profile]
+    E --> E2[Export/Import Data]
+    E --> E3[API Key Management]
+
+    F[Navigation Sidebar] --> A
+    F --> B
+    F --> C
+    F --> D
+    F --> E
+
+    G[Top Bar] --> G1[Quick Actions]
+    G --> G2[User Info]
