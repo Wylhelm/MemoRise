@@ -1,0 +1,35 @@
+graph TD
+    A[User Interaction] --> B{Input Type?}
+    B -->|Text| C[Text Input]
+    B -->|Voice| D[Voice Input]
+    B -->|Image| E[Image Input]
+    B -->|Video| F[Video Input]
+    
+    C --> G[NLP Processing]
+    D --> H[Speech-to-Text Conversion]
+    E --> I[Image Recognition]
+    F --> J[Video Analysis]
+    
+    H --> G
+    I --> G
+    J --> G
+    
+    G --> K[Information Categorization]
+    K --> L[Store in Database]
+    
+    M[External Systems] -->|Sync| L
+    M -->|Agenda| M1[Calendar Events]
+    M -->|Email| M2[Related Emails]
+    
+    L --> N{User Query}
+    N -->|Retrieval Request| O[Search Database]
+    O --> P[Apply RAG]
+    P --> Q[Generate Response]
+    Q --> R[Present to User]
+    
+    R --> S{User Satisfied?}
+    S -->|Yes| T[End Process]
+    S -->|No| N
+    
+    U[Continuous Learning] --> G
+    U --> O
