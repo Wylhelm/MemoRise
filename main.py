@@ -14,9 +14,6 @@ from azure.core.credentials import AzureKeyCredential
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
 
-# Initialize speech recognizer
-recognizer = sr.Recognizer()
-
 # Azure AI credentials
 text_analytics_key = "beb426be64af4d5181ecff4801816f72"
 text_analytics_endpoint = "https://pylanguage.cognitiveservices.azure.com/"
