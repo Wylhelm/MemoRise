@@ -17,8 +17,8 @@ nltk.download('stopwords', quiet=True)
 # Azure AI credentials
 text_analytics_key = "beb426be64af4d5181ecff4801816f72"
 text_analytics_endpoint = "https://pylanguage.cognitiveservices.azure.com/"
-speech_key = "YOUR_AZURE_SPEECH_KEY"
-speech_region = "YOUR_AZURE_SPEECH_REGION"
+speech_key = "9c84dbbed4474be4b5f2dfbfcc53b5d3"
+speech_region = "eastus"
 
 # Initialize the Azure AI Text Analytics client
 text_analytics_client = TextAnalyticsClient(endpoint=text_analytics_endpoint, credential=AzureKeyCredential(text_analytics_key))
