@@ -24,8 +24,10 @@
         const silenceThreshold = 2000; // 2 seconds of silence
 
         $("#startRecording").click(function() {
+            console.log("Start recording button clicked");
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
+                    console.log("Audio stream obtained");
                     mediaRecorder = new MediaRecorder(stream);
                     mediaRecorder.start();
 
@@ -33,6 +35,7 @@
                     $("#recordingStatus").text("Recording... (Will stop automatically after 2 seconds of silence)");
 
                     mediaRecorder.addEventListener("dataavailable", event => {
+                        console.log("Data available event triggered");
                         audioChunks.push(event.data);
                         resetSilenceTimer();
                     });
@@ -53,8 +56,10 @@
                         analyser.getByteFrequencyData(dataArray);
                         const sum = dataArray.reduce((a, b) => a + b, 0);
                         const average = sum / bufferLength;
+                        console.log("Average audio level:", average);
                         
                         if (average < 10) { // Adjust this threshold as needed
+                            console.log("Silence detected");
                             resetSilenceTimer();
                         }
                     }
@@ -66,19 +71,26 @@
 
                     // Start checking for silence
                     setInterval(checkSilence, 100);
+                })
+                .catch(error => {
+                    console.error("Error accessing microphone:", error);
+                    $("#recordingStatus").text("Error: Unable to access microphone. Please check your browser settings.");
+                    $("#recordingStatus").removeClass("text-success").addClass("text-danger");
                 });
         });
 
         function stopRecording() {
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
-                console.log("Recording stopped automatically");
+                console.log("Recording stopped");
                 $("#startRecording").show();
                 $("#stopRecording").hide();
                 $("#recordingStatus").text("Processing...");
 
                 mediaRecorder.addEventListener("stop", () => {
-                    const audioBlob = new Blob(audioChunks);
+                    console.log("MediaRecorder stopped event triggered");
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    console.log("Audio blob created, size:", audioBlob.size, "bytes");
                     const formData = new FormData();
                     formData.append("audio", audioBlob, "recording.wav");
 
