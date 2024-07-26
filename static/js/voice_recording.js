@@ -49,30 +49,39 @@ function stopRecording() {
 }
 
 function pollProcessingStatus(audioData) {
-    $.ajax({
-        url: "/process_voice_memory",
-        type: "POST",
-        data: JSON.stringify({ audio: audioData }),
-        contentType: "application/json",
-        success: function(response) {
-            console.log("Processing status:", response);
-            if (response.status === 'complete') {
-                $("#recordingStatus").text(response.message);
-            } else if (response.status === 'error') {
-                $("#recordingStatus").text("Error: " + response.message);
-            } else {
-                // If still processing, update status and poll again after a delay
-                $("#recordingStatus").text(response.message);
-                setTimeout(function() {
-                    pollProcessingStatus(audioData);
-                }, 2000); // Poll every 2 seconds
+    let attempts = 0;
+    const maxAttempts = 15; // Maximum number of polling attempts (30 seconds total)
+
+    function poll() {
+        $.ajax({
+            url: "/process_voice_memory",
+            type: "POST",
+            data: JSON.stringify({ audio: audioData }),
+            contentType: "application/json",
+            success: function(response) {
+                console.log("Processing status:", response);
+                if (response.status === 'complete') {
+                    $("#recordingStatus").text(response.message);
+                } else if (response.status === 'error') {
+                    $("#recordingStatus").text("Error: " + response.message);
+                } else {
+                    attempts++;
+                    if (attempts < maxAttempts) {
+                        $("#recordingStatus").text(response.message + " (Attempt " + attempts + "/" + maxAttempts + ")");
+                        setTimeout(poll, 2000); // Poll every 2 seconds
+                    } else {
+                        $("#recordingStatus").text("Processing timed out. Please try again.");
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("AJAX Error:", textStatus, errorThrown);
+                $("#recordingStatus").text("An error occurred while checking voice memory processing status.");
             }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error("AJAX Error:", textStatus, errorThrown);
-            $("#recordingStatus").text("An error occurred while checking voice memory processing status.");
-        }
-    });
+        });
+    }
+
+    poll(); // Start polling
 }
 
 $(document).ready(function() {
