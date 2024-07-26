@@ -42,6 +42,9 @@ def get_sentiment_trends(interval='W'):
     df_resampled = df.resample(interval)['sentiment_numeric'].mean().reindex(date_range).fillna(0)
     df_resampled = df_resampled.reset_index()
 
+    print("df_resampled columns:", df_resampled.columns)
+    print("df_resampled head:", df_resampled.head())
+
     plt.figure(figsize=(12, 6))
     sns.lineplot(data=df_resampled, x=df_resampled.index, y='sentiment_numeric', marker='o')
 
