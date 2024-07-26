@@ -66,7 +66,7 @@ $(document).ready(function() {
         formData.append("audio", audioBlob, "recording.wav");
 
         $.ajax({
-            url: "/add_voice_memory",
+            url: "{{ url_for('memory.add_voice_memory') }}",
             type: "POST",
             data: formData,
             processData: false,
