@@ -16,29 +16,38 @@ def add_memory_route():
 
 @bp.route('/add_voice_memory', methods=['POST'])
 def add_voice_memory():
+    import logging
+    logging.basicConfig(filename='voice_memory.log', level=logging.DEBUG)
+    
     if 'audio' not in request.files:
+        logging.error('No audio file received')
         return jsonify({'success': False, 'message': 'No audio file received'})
     
     audio_file = request.files['audio']
     if audio_file.filename == '':
+        logging.error('No audio file selected')
         return jsonify({'success': False, 'message': 'No audio file selected'})
     
     temp_filename = 'temp_audio.wav'
     audio_file.save(temp_filename)
     
     try:
+        logging.info(f'Processing audio file: {temp_filename}')
         content = get_voice_input(temp_filename)
         if content:
             memory_id = add_memory(content)
+            logging.info(f'Memory added successfully. ID: {memory_id}, Content: {content[:50]}...')
             return jsonify({'success': True, 'message': f'Memory added successfully! Content: {content[:50]}... ID: {memory_id}'})
         else:
+            logging.warning('Failed to process voice memory. No speech detected.')
             return jsonify({'success': False, 'message': 'Failed to process voice memory. No speech detected.'})
     except Exception as e:
-        print(f"Error in add_voice_memory: {str(e)}")
+        logging.error(f"Error in add_voice_memory: {str(e)}", exc_info=True)
         return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'})
     finally:
         if os.path.exists(temp_filename):
             os.remove(temp_filename)
+            logging.info(f'Temporary file removed: {temp_filename}')
 
 @bp.route('/retrieve_memories', methods=['GET', 'POST'])
 def retrieve_memories_route():
