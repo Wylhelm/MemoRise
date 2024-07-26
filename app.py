@@ -1,9 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 from main import setup_database, add_memory, retrieve_memories, update_memory, delete_memory, export_memories, get_voice_input
 import os
+import json
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+
+@app.template_filter('from_json')
+def from_json(value):
+    try:
+        return json.loads(value)
+    except:
+        return value
 
 @app.route('/')
 def index():
