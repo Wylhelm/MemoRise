@@ -25,10 +25,8 @@ function stopRecording() {
                     contentType: "application/json",
                     success: function(response) {
                         console.log("Server response:", response);
-                        if (response.status === 'complete') {
-                            $("#recordingStatus").text(response.message);
-                        } else {
-                            $("#recordingStatus").text("Error: " + response.message);
+                        $("#recordingStatus").text(response.message);
+                        if (response.status !== 'complete') {
                             console.error("Server returned error:", response);
                         }
                     },
