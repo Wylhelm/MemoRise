@@ -33,3 +33,38 @@
     </div>
 </div>
 {% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Welcome to Memory Augmentation App</h1>
+<p>This application helps you store and retrieve your memories efficiently.</p>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Add Memory</h5>
+                <p class="card-text">Add a new memory to your collection.</p>
+                <a href="{{ url_for('memory.add_memory_route') }}" class="btn btn-primary">Add Memory</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Retrieve Memories</h5>
+                <p class="card-text">Search and view your stored memories.</p>
+                <a href="{{ url_for('memory.retrieve_memories_route') }}" class="btn btn-primary">Retrieve Memories</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Export Memories</h5>
+                <p class="card-text">Export your memories to CSV or JSON format.</p>
+                <a href="{{ url_for('export.export_memories_route') }}" class="btn btn-primary">Export Memories</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
