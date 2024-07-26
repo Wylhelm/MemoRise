@@ -45,7 +45,8 @@ def get_memory_insights():
         }
 
     # Most mentioned entities
-    all_entities = [entity for memory in memories for entity in json.loads(memory.entities)]
+    all_entities = [entity for memory in memories for entity in json.loads(memory.entities) if isinstance(entity, str)]
+    all_entities += [entity[0] for memory in memories for entity in json.loads(memory.entities) if isinstance(entity, list) and len(entity) > 0]
     entity_counts = Counter(all_entities)
     top_entities = dict(entity_counts.most_common(10))
 
