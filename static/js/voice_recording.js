@@ -49,9 +49,9 @@ $(document).ready(function() {
                         type: "POST",
                         data: JSON.stringify({ audio: base64data }),
                         contentType: "application/json",
-                    success: function(response) {
-                        console.log("Server response:", response);
-                        if (response.success) {
+                        success: function(response) {
+                            console.log("Server response:", response);
+                            if (response.success) {
                             $("#recordingStatus").text(response.message);
                         } else {
                             $("#recordingStatus").text("Error: " + response.message);
