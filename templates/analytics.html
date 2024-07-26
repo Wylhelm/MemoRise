@@ -5,16 +5,16 @@
 <h1>Memory Analytics</h1>
 
 <h2>Sentiment Trends</h2>
-<form method="GET" action="{{ url_for('analytics.analytics') }}">
-    <div class="form-group">
-        <label for="interval">Select Interval:</label>
-        <select class="form-control" id="interval" name="interval">
+<form method="GET" action="{{ url_for('analytics.analytics') }}" class="form-inline mb-3">
+    <div class="form-group mr-2">
+        <label for="interval" class="mr-2">Select Interval:</label>
+        <select class="form-control form-control-sm" id="interval" name="interval">
             <option value="D" {% if request.args.get('interval') == 'D' %} selected {% endif %}>Day</option>
             <option value="W" {% if request.args.get('interval') == 'W' %} selected {% endif %}>Week</option>
             <option value="M" {% if request.args.get('interval') == 'M' %} selected {% endif %}>Month</option>
         </select>
     </div>
-    <button type="submit" class="btn btn-primary">Update</button>
+    <button type="submit" class="btn btn-primary btn-sm">Update</button>
 </form>
 {% if sentiment_trends %}
     <img src="data:image/png;base64,{{ sentiment_trends }}" alt="Sentiment Trends">
