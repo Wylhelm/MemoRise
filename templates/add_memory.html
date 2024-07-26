@@ -34,10 +34,9 @@
                     console.log("Recording started");
                     $("#recordingStatus").text("Recording... (Will stop automatically after 2 seconds of silence)");
 
-                    mediaRecorder.addEventListener("dataavailable", event => {
+                    mediaRecorder.addEventListener("dataavailable", function(event) {
                         console.log("Data available event triggered");
                         audioChunks.push(event.data);
-                        resetSilenceTimer();
                     });
 
                     $("#startRecording").hide();
@@ -65,13 +64,20 @@
                     }
 
 
-                    function resetSilenceTimer() {
-                        clearTimeout(silenceTimer);
-                        silenceTimer = setTimeout(stopRecording, silenceThreshold);
+                    function checkSilence() {
+                        analyser.getByteFrequencyData(dataArray);
+                        const sum = dataArray.reduce((a, b) => a + b, 0);
+                        const average = sum / bufferLength;
+                        console.log("Average audio level:", average);
+                        
+                        if (average < 10) { // Adjust this threshold as needed
+                            console.log("Silence detected");
+                            stopRecording();
+                        }
                     }
 
                     // Start checking for silence
-                    setInterval(checkSilence, 100);
+                    const silenceCheckInterval = setInterval(checkSilence, 100);
                 })
                 .catch(error => {
                     console.error("Error accessing microphone:", error);
@@ -83,6 +89,7 @@
         function stopRecording() {
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
+                clearInterval(silenceCheckInterval); // Stop checking for silence
                 console.log("Recording stopped");
                 $("#startRecording").show();
                 $("#stopRecording").hide();
