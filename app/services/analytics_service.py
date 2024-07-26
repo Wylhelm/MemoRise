@@ -24,26 +24,46 @@ def get_sentiment_trends(interval='W'):
     sentiment_map = {'positive': 1, 'neutral': 0, 'negative': -1}
     df['sentiment_numeric'] = df['sentiment'].map(sentiment_map)
 
+    # Filter data based on the interval
+    now = pd.Timestamp.now()
+    if interval == 'M':
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        end_date = now.replace(year=now.year + 1, month=1, day=1) - pd.Timedelta(days=1)
+        df = df[start_date:end_date]
+    elif interval == 'W':
+        start_date = now - pd.Timedelta(days=now.weekday())
+        end_date = start_date + pd.Timedelta(days=6)
+        df = df[start_date:end_date]
+    elif interval == 'D':
+        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = start_date + pd.Timedelta(days=1) - pd.Timedelta(microseconds=1)
+        df = df[start_date:end_date]
+
     # Resample and calculate mean sentiment
-    df_resampled = df.resample(interval)['sentiment_numeric'].mean().reset_index()
+    if interval == 'D':
+        df_resampled = df.resample('H')['sentiment_numeric'].mean().reset_index()
+    else:
+        df_resampled = df.resample(interval)['sentiment_numeric'].mean().reset_index()
 
     plt.figure(figsize=(12, 6))
     sns.lineplot(data=df_resampled, x='timestamp', y='sentiment_numeric', marker='o')
 
     # Customize x-axis based on interval
     if interval == 'D':
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        plt.gca().xaxis.set_major_locator(mdates.DayLocator())
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+        plt.gca().xaxis.set_major_locator(mdates.HourLocator())
+        plt.xlabel('Hour')
     elif interval == 'W':
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%W'))
-        plt.gca().xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MONDAY))
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%a'))
+        plt.gca().xaxis.set_major_locator(mdates.DayLocator())
+        plt.xlabel('Day of Week')
     elif interval == 'M':
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b'))
         plt.gca().xaxis.set_major_locator(mdates.MonthLocator())
+        plt.xlabel('Month')
 
     plt.xticks(rotation=45)
     plt.title('Sentiment Trends Over Time')
-    plt.xlabel('Date')
     plt.ylabel('Average Sentiment')
     plt.ylim(-1, 1)  # Set y-axis limits
 
