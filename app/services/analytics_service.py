@@ -15,6 +15,8 @@ def get_sentiment_trends(interval='W'):
     memories = Memory.query.order_by(Memory.timestamp).all()
     if not memories:
         return None  # Return None if there are no memories
+    
+    print(f"Number of memories: {len(memories)}")  # Debug print
 
     df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
     df['timestamp'] = pd.to_datetime(df['timestamp'])
@@ -48,8 +50,11 @@ def get_sentiment_trends(interval='W'):
     df_resampled = df_filtered.set_index('timestamp').resample(interval)['sentiment_numeric'].mean().reindex(date_range).fillna(0)
     df_resampled = df_resampled.reset_index()
 
+    print(f"Resampled data shape: {df_resampled.shape}")  # Debug print
+    print(f"Resampled data columns: {df_resampled.columns}")  # Debug print
+
     plt.figure(figsize=(12, 6))
-    sns.lineplot(data=df_resampled, x='timestamp', y='sentiment_numeric', marker='o')
+    plt.plot(df_resampled.index, df_resampled['sentiment_numeric'], marker='o')
 
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter(date_format))
     plt.xlabel(x_label)
