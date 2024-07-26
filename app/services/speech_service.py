@@ -3,13 +3,13 @@ from config import Config
 
 speech_config = speechsdk.SpeechConfig(subscription=Config.SPEECH_KEY, region=Config.SPEECH_REGION)
 
-def get_voice_input(audio_file_path):
+def get_voice_input(audio_stream):
     import logging
     logging.basicConfig(filename='voice_memory.log', level=logging.DEBUG)
     
-    logging.info(f"Starting voice input processing for file: {audio_file_path}")
+    logging.info("Starting voice input processing for audio stream")
     auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(languages=["en-US", "es-ES", "fr-FR", "de-DE"])
-    audio_config = speechsdk.audio.AudioConfig(filename=audio_file_path)
+    audio_config = speechsdk.audio.AudioConfig(stream=audio_stream)
     speech_recognizer = speechsdk.SpeechRecognizer(
         speech_config=speech_config, 
         auto_detect_source_language_config=auto_detect_source_language_config,
