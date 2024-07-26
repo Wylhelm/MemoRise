@@ -34,6 +34,8 @@ def get_sentiment_trends(interval='W'):
         start_date = now - pd.Timedelta(days=now.weekday())
         end_date = start_date + pd.Timedelta(days=6)
         df = df[start_date:end_date]
+        df_resampled = df.resample('D')['sentiment_numeric'].mean().reset_index()
+        df_resampled = df_resampled.iloc[-7:]  # Keep only the last 7 days
     elif interval == 'D':
         start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end_date = start_date + pd.Timedelta(days=1) - pd.Timedelta(microseconds=1)
