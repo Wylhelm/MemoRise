@@ -28,11 +28,29 @@ def add_memory_route():
 
 @app.route('/add_voice_memory', methods=['POST'])
 def add_voice_memory():
-    content = get_voice_input()
-    if content:
-        memory_id = add_memory(content)
-        return jsonify({'success': True, 'message': f'Memory added successfully! ID: {memory_id}'})
-    return jsonify({'success': False, 'message': 'Failed to record voice memory'})
+    try:
+        if 'audio' not in request.files:
+            return jsonify({'success': False, 'message': 'No audio file received'})
+        
+        audio_file = request.files['audio']
+        if audio_file.filename == '':
+            return jsonify({'success': False, 'message': 'No audio file selected'})
+        
+        # Save the audio file temporarily
+        temp_filename = 'temp_audio.wav'
+        audio_file.save(temp_filename)
+        
+        # Process the audio file
+        content = get_voice_input(temp_filename)
+        
+        if content:
+            memory_id = add_memory(content)
+            return jsonify({'success': True, 'message': f'Memory added successfully! ID: {memory_id}'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to process voice memory'})
+    except Exception as e:
+        app.logger.error(f"Error in add_voice_memory: {str(e)}")
+        return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'})
 
 @app.route('/retrieve_memories', methods=['GET', 'POST'])
 def retrieve_memories_route():

@@ -197,17 +197,17 @@ def export_memories(format='csv'):
     return filename
 
 # Voice input function with automatic language detection using Azure
-def get_voice_input():
+def get_voice_input(audio_file_path):
     # Create a speech recognizer with auto language detection (limited to 4 languages)
     auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(languages=["en-US", "es-ES", "fr-FR", "de-DE"])
-    audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+    audio_config = speechsdk.audio.AudioConfig(filename=audio_file_path)
     speech_recognizer = speechsdk.SpeechRecognizer(
         speech_config=speech_config, 
         auto_detect_source_language_config=auto_detect_source_language_config,
         audio_config=audio_config
     )
 
-    print("Listening... Speak your memory in English, Spanish, French, or German.")
+    print("Processing audio file...")
     
     # Start speech recognition
     result = speech_recognizer.recognize_once_async().get()
@@ -216,10 +216,10 @@ def get_voice_input():
     if result.reason == speechsdk.ResultReason.RecognizedSpeech:
         detected_language = result.properties.get(speechsdk.PropertyId.SpeechServiceConnection_AutoDetectSourceLanguageResult)
         print(f"Detected language: {detected_language}")
-        print("You said: " + result.text)
+        print("Transcribed text: " + result.text)
         return result.text
     elif result.reason == speechsdk.ResultReason.NoMatch:
-        print("No speech could be recognized")
+        print("No speech could be recognized in the audio file")
     elif result.reason == speechsdk.ResultReason.Canceled:
         cancellation_details = result.cancellation_details
         print(f"Speech recognition canceled: {cancellation_details.reason}")
