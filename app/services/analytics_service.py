@@ -35,14 +35,15 @@ def get_sentiment_trends(interval='W'):
         end_date = start_date + pd.Timedelta(days=6)
         date_range = pd.date_range(start=start_date, end=end_date, freq='D')
         df_resampled = df.resample('D')['sentiment_numeric'].mean().reindex(date_range).fillna(0)
+        df_resampled = df_resampled.reset_index()
     elif interval == 'D':
         start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end_date = start_date + pd.Timedelta(days=1) - pd.Timedelta(microseconds=1)
         df = df[start_date:end_date]
         df_resampled = df.resample('H')['sentiment_numeric'].mean().reset_index()
 
-    # For month and day views, resample as before
-    if interval in ['M', 'D']:
+    # For month view, resample as before
+    if interval == 'M':
         df_resampled = df.resample(interval)['sentiment_numeric'].mean().reset_index()
 
     plt.figure(figsize=(12, 6))
