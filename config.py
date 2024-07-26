@@ -8,5 +8,3 @@ class Config:
     # Azure AI credentials
     TEXT_ANALYTICS_KEY = "beb426be64af4d5181ecff4801816f72"
     TEXT_ANALYTICS_ENDPOINT = "https://pylanguage.cognitiveservices.azure.com/"
-    SPEECH_KEY = "9c84dbbed4474be4b5f2dfbfcc53b5d3"
-    SPEECH_REGION = "eastus"

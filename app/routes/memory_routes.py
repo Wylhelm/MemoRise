@@ -1,7 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.services.memory_service import add_memory, retrieve_memories, update_memory, delete_memory
-from app.services.speech_service import get_voice_input
-import os
 
 bp = Blueprint('memory', __name__)
 
@@ -13,86 +11,6 @@ def add_memory_route():
         flash(f'Memory added successfully! ID: {memory_id}', 'success')
         return redirect(url_for('main.index'))
     return render_template('add_memory.html')
-
-@bp.route('/add_voice_memory', methods=['POST'])
-def add_voice_memory():
-    import logging
-    import base64
-    import io
-    import os
-    from logging.handlers import RotatingFileHandler
-
-    import logging
-    import os
-    from logging.handlers import RotatingFileHandler
-
-    # Set up logging
-    log_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'logs')
-    if not os.path.exists(log_directory):
-        os.makedirs(log_directory)
-    log_file = os.path.join(log_directory, 'voice_memory.log')
-    
-    # Create a logger
-    logger = logging.getLogger('voice_memory')
-    logger.setLevel(logging.DEBUG)
-
-    # Create a rotating file handler
-    file_handler = RotatingFileHandler(log_file, maxBytes=10240, backupCount=10)
-    file_handler.setLevel(logging.DEBUG)
-
-    # Create a formatter and add it to the handler
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-
-    # Add the handler to the logger
-    if not logger.hasHandlers():
-        logger.addHandler(file_handler)
-
-    logger.info('Logger setup complete. Log file: %s', log_file)
-
-    print('Received add_voice_memory request')
-    logger.info('Received add_voice_memory request')
-    data = request.json
-    if 'audio' not in data:
-        print('No audio data received')
-        logger.error('No audio data received')
-        return jsonify({'success': False, 'message': 'No audio data received', 'status': 'error'})
-    
-    print('Decoding audio data')
-    logger.info('Decoding audio data')
-    audio_data = base64.b64decode(data['audio'])
-    audio_stream = io.BytesIO(audio_data)
-    
-    try:
-        print('Processing audio data')
-        logger.info('Processing audio data')
-        content = get_voice_input(audio_stream)
-        print(f'Voice input result: {content}')
-        logger.info(f'Voice input result: {content}')
-        if content:
-            print('Adding memory to database')
-            logger.info('Adding memory to database')
-            try:
-                memory_id = add_memory(content)
-                print(f'Memory added successfully. ID: {memory_id}, Content: {content[:50]}...')
-                logger.info(f'Memory added successfully. ID: {memory_id}, Content: {content[:50]}...')
-                return jsonify({'success': True, 'message': f'Memory added successfully! Content: {content[:50]}... ID: {memory_id}', 'status': 'complete'})
-            except Exception as db_error:
-                print(f"Database error in add_memory: {str(db_error)}")
-                logger.error(f"Database error in add_memory: {str(db_error)}", exc_info=True)
-                return jsonify({'success': False, 'message': f'Database error: {str(db_error)}', 'status': 'error'})
-        else:
-            print('Failed to process voice memory. No speech detected.')
-            logger.warning('Failed to process voice memory. No speech detected.')
-            return jsonify({'success': False, 'message': 'Failed to process voice memory. No speech detected.', 'status': 'error'})
-    except Exception as e:
-        print(f"Error in add_voice_memory: {str(e)}")
-        logger.error(f"Error in add_voice_memory: {str(e)}", exc_info=True)
-        return jsonify({'success': False, 'message': f'An error occurred: {str(e)}', 'status': 'error'})
-
-@bp.route('/process_voice_memory', methods=['POST'])
-def process_voice_memory():
-    return jsonify({'success': False, 'message': 'This endpoint is no longer used.', 'status': 'error'})
 
 @bp.route('/retrieve_memories', methods=['GET', 'POST'])
 def retrieve_memories_route():

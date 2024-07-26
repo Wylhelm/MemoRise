@@ -54,6 +54,11 @@ def update_memory(memory_id, new_content):
     if memory:
         memory.content = new_content
         memory.category = enhanced_categorize_text(new_content)
+        memory.sentiment, confidence = analyze_sentiment(new_content)
+        memory.sentiment_scores = json.dumps(confidence.__dict__)
+        memory.entities = json.dumps(recognize_entities(new_content))
+        memory.key_phrases = json.dumps(extract_key_phrases(new_content))
+        memory.language, memory.language_code = detect_language(new_content)
         db.session.commit()
         return True
     return False

@@ -9,12 +9,4 @@
     </div>
     <button type="submit" class="btn btn-primary">Add Memory</button>
 </form>
-<hr>
-<h2>Add Voice Memory</h2>
-<button id="startRecording" class="btn btn-success">Start Recording</button>
-<button id="stopRecording" class="btn btn-danger" style="display: none;">Stop Recording</button>
-<p id="recordingStatus"></p>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{{ url_for('static', filename='js/voice_recording.js') }}"></script>
 {% endblock %}
