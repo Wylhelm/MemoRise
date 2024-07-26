@@ -10,6 +10,9 @@ def create_app(config_class=Config):
 
     db.init_app(app)
 
+    with app.app_context():
+        db.create_all()
+
     from app.routes import main_routes, memory_routes, export_routes
     app.register_blueprint(main_routes.bp)
     app.register_blueprint(memory_routes.bp)
