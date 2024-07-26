@@ -199,7 +199,7 @@ def export_memories(format='csv'):
 # Voice input function with automatic language detection using Azure
 def get_voice_input(audio_file_path):
     import logging
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(__name__)
 
     logger.info(f"Processing audio file: {audio_file_path}")
@@ -226,12 +226,17 @@ def get_voice_input(audio_file_path):
         return result.text
     elif result.reason == speechsdk.ResultReason.NoMatch:
         logger.error("No speech could be recognized in the audio file")
+        logger.debug(f"NoMatch details: {result.no_match_details}")
     elif result.reason == speechsdk.ResultReason.Canceled:
         cancellation_details = result.cancellation_details
         logger.error(f"Speech recognition canceled: {cancellation_details.reason}")
         if cancellation_details.reason == speechsdk.CancellationReason.Error:
             logger.error(f"Error details: {cancellation_details.error_details}")
+            logger.debug(f"Did you update the subscription info?")
+    else:
+        logger.error(f"Unexpected result reason: {result.reason}")
 
+    logger.debug(f"Result properties: {result.properties}")
     return None
 
 # Remove the main() function and if __name__ == "__main__" block

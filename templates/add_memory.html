@@ -20,6 +20,8 @@
     $(document).ready(function() {
         let mediaRecorder;
         let audioChunks = [];
+        let silenceTimer;
+        const silenceThreshold = 2000; // 2 seconds of silence
 
         $("#startRecording").click(function() {
             navigator.mediaDevices.getUserMedia({ audio: true })
@@ -27,52 +29,88 @@
                     mediaRecorder = new MediaRecorder(stream);
                     mediaRecorder.start();
 
+                    console.log("Recording started");
+                    $("#recordingStatus").text("Recording... (Will stop automatically after 2 seconds of silence)");
+
                     mediaRecorder.addEventListener("dataavailable", event => {
                         audioChunks.push(event.data);
+                        resetSilenceTimer();
                     });
 
                     $("#startRecording").hide();
                     $("#stopRecording").show();
-                    $("#recordingStatus").text("Recording...");
+
+                    // Set up audio analysis for silence detection
+                    const audioContext = new AudioContext();
+                    const analyser = audioContext.createAnalyser();
+                    const microphone = audioContext.createMediaStreamSource(stream);
+                    microphone.connect(analyser);
+                    analyser.fftSize = 2048;
+                    const bufferLength = analyser.frequencyBinCount;
+                    const dataArray = new Uint8Array(bufferLength);
+
+                    function checkSilence() {
+                        analyser.getByteFrequencyData(dataArray);
+                        const sum = dataArray.reduce((a, b) => a + b, 0);
+                        const average = sum / bufferLength;
+                        
+                        if (average < 10) { // Adjust this threshold as needed
+                            resetSilenceTimer();
+                        }
+                    }
+
+                    function resetSilenceTimer() {
+                        clearTimeout(silenceTimer);
+                        silenceTimer = setTimeout(stopRecording, silenceThreshold);
+                    }
+
+                    // Start checking for silence
+                    setInterval(checkSilence, 100);
                 });
         });
 
-        $("#stopRecording").click(function() {
-            mediaRecorder.stop();
-            $("#startRecording").show();
-            $("#stopRecording").hide();
-            $("#recordingStatus").text("Processing...");
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+                console.log("Recording stopped automatically");
+                $("#startRecording").show();
+                $("#stopRecording").hide();
+                $("#recordingStatus").text("Processing...");
 
-            mediaRecorder.addEventListener("stop", () => {
-                const audioBlob = new Blob(audioChunks);
-                const formData = new FormData();
-                formData.append("audio", audioBlob, "recording.wav");
+                mediaRecorder.addEventListener("stop", () => {
+                    const audioBlob = new Blob(audioChunks);
+                    const formData = new FormData();
+                    formData.append("audio", audioBlob, "recording.wav");
 
-                $.ajax({
-                    url: "{{ url_for('add_voice_memory') }}",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.success) {
-                            $("#recordingStatus").text(response.message);
-                            $("#recordingStatus").removeClass("text-danger").addClass("text-success");
-                        } else {
-                            $("#recordingStatus").text("Error: " + response.message);
+                    $.ajax({
+                        url: "{{ url_for('add_voice_memory') }}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            console.log("Server response:", response);
+                            if (response.success) {
+                                $("#recordingStatus").text(response.message);
+                                $("#recordingStatus").removeClass("text-danger").addClass("text-success");
+                            } else {
+                                $("#recordingStatus").text("Error: " + response.message);
+                                $("#recordingStatus").removeClass("text-success").addClass("text-danger");
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.error("AJAX Error:", textStatus, errorThrown);
+                            $("#recordingStatus").text("An error occurred while processing the voice memory. Please check the console for details.");
                             $("#recordingStatus").removeClass("text-success").addClass("text-danger");
                         }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error("AJAX Error:", textStatus, errorThrown);
-                        $("#recordingStatus").text("An error occurred while processing the voice memory. Please check the console for details.");
-                        $("#recordingStatus").removeClass("text-success").addClass("text-danger");
-                    }
-                });
+                    });
 
-                audioChunks = [];
-            });
-        });
+                    audioChunks = [];
+                });
+            }
+        }
+
+        $("#stopRecording").click(stopRecording);
     });
 </script>
 {% endblock %}
