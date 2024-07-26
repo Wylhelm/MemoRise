@@ -61,8 +61,18 @@
                     {% set entities = memory[6] | from_json %}
                     {% if entities is string %}
                         {{ entities }}
+                    {% elif entities is iterable %}
+                        {% for entity in entities %}
+                            {% if entity is mapping %}
+                                {{ entity.get('text', '') }} ({{ entity.get('category', '') }}){% if not loop.last %}, {% endif %}
+                            {% elif entity is iterable and entity|length >= 2 %}
+                                {{ entity[0] }} ({{ entity[1] }}){% if not loop.last %}, {% endif %}
+                            {% else %}
+                                {{ entity }}{% if not loop.last %}, {% endif %}
+                            {% endif %}
+                        {% endfor %}
                     {% else %}
-                        {{ ', '.join([f'{e[0]} ({e[1]})' for e in entities]) }}
+                        Unable to display entities
                     {% endif %}
                 </p>
                 <a href="{{ url_for('update_memory_route', memory_id=memory[0]) }}" class="btn btn-primary btn-sm">Edit</a>
