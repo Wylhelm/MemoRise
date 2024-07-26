@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 from main import setup_database, add_memory, retrieve_memories, update_memory, delete_memory, export_memories, get_voice_input
 import os
 
