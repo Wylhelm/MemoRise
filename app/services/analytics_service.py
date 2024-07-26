@@ -10,10 +10,13 @@ import json
 
 def get_sentiment_trends():
     memories = Memory.query.order_by(Memory.timestamp).all()
+    if not memories:
+        return None  # Return None if there are no memories
+
     df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     df = df.set_index('timestamp')
-    df = df.resample('D').agg(lambda x: x.value_counts().index[0])
+    df = df.resample('D').agg(lambda x: x.value_counts().index[0] if len(x) > 0 else None)
 
     plt.figure(figsize=(12, 6))
     sns.lineplot(data=df, x=df.index, y='sentiment')
@@ -26,11 +29,19 @@ def get_sentiment_trends():
     img.seek(0)
     plot_url = base64.b64encode(img.getvalue()).decode()
 
+    plt.close()  # Close the plot to free up memory
     return plot_url
 
 def get_memory_insights():
     memories = Memory.query.all()
     
+    if not memories:
+        return {
+            'top_entities': {},
+            'top_categories': {},
+            'top_phrases': {}
+        }
+
     # Most mentioned entities
     all_entities = [entity for memory in memories for entity in json.loads(memory.entities)]
     entity_counts = Counter(all_entities)

@@ -7,4 +7,6 @@ bp = Blueprint('analytics', __name__)
 def analytics():
     sentiment_trends = get_sentiment_trends()
     memory_insights = get_memory_insights()
+    print("Sentiment Trends:", sentiment_trends)  # Debug print
+    print("Memory Insights:", memory_insights)  # Debug print
     return render_template('analytics.html', sentiment_trends=sentiment_trends, memory_insights=memory_insights)
