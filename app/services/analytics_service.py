@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import seaborn as sns
 import io
 import base64
@@ -18,25 +19,46 @@ def get_sentiment_trends(interval='W'):
     df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     df = df.set_index('timestamp')
-    df = df.resample(interval).agg(lambda x: x.value_counts().index[0] if len(x) > 0 else None)
+
+    # Convert sentiment to numeric values
+    sentiment_map = {'positive': 1, 'neutral': 0, 'negative': -1}
+    df['sentiment_numeric'] = df['sentiment'].map(sentiment_map)
+
+    # Resample and calculate mean sentiment
+    df_resampled = df.resample(interval)['sentiment_numeric'].mean().reset_index()
 
     plt.figure(figsize=(12, 6))
-    sns.lineplot(data=df, x=df.index, y='sentiment', marker='o')
+    sns.lineplot(data=df_resampled, x='timestamp', y='sentiment_numeric', marker='o')
+
+    # Customize x-axis based on interval
     if interval == 'D':
-        all_hours = pd.date_range(start=df.index.min(), end=df.index.max(), freq='H')
-        plt.xticks(all_hours, [date.strftime('%H:%M') for date in all_hours], rotation=45)
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        plt.gca().xaxis.set_major_locator(mdates.DayLocator())
     elif interval == 'W':
-        all_days = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
-        plt.xticks(all_days, [date.strftime('%A') for date in all_days], rotation=45)
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%W'))
+        plt.gca().xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MONDAY))
     elif interval == 'M':
-        all_dates = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
-        plt.xticks(all_dates, [date.strftime('%d') for date in all_dates], rotation=45)
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+        plt.gca().xaxis.set_major_locator(mdates.MonthLocator())
+
+    plt.xticks(rotation=45)
     plt.title('Sentiment Trends Over Time')
     plt.xlabel('Date')
-    plt.ylabel('Sentiment')
+    plt.ylabel('Average Sentiment')
+    plt.ylim(-1, 1)  # Set y-axis limits
+
+    # Add horizontal lines for sentiment levels
+    plt.axhline(y=0, color='gray', linestyle='--', alpha=0.7)
+    plt.axhline(y=1, color='green', linestyle=':', alpha=0.7)
+    plt.axhline(y=-1, color='red', linestyle=':', alpha=0.7)
+
+    # Add legend
+    plt.text(plt.xlim()[1], 1, 'Positive', verticalalignment='center', horizontalalignment='left', color='green')
+    plt.text(plt.xlim()[1], 0, 'Neutral', verticalalignment='center', horizontalalignment='left', color='gray')
+    plt.text(plt.xlim()[1], -1, 'Negative', verticalalignment='center', horizontalalignment='left', color='red')
 
     img = io.BytesIO()
-    plt.savefig(img, format='png')
+    plt.savefig(img, format='png', bbox_inches='tight')
     img.seek(0)
     plot_url = base64.b64encode(img.getvalue()).decode()
 
