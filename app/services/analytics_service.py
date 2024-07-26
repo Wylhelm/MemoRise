@@ -26,29 +26,30 @@ def get_sentiment_trends(interval='W'):
     # Filter data based on the interval
     now = pd.Timestamp.now()
     if interval == 'M':
-        start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-        end_date = now.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0) - pd.DateOffset(months=11)
+        end_date = now
         date_range = pd.date_range(start=start_date, end=end_date, freq='M')
         x_label = 'Month'
-        date_format = '%b'
+        date_format = '%b %Y'
     elif interval == 'W':
-        start_date = now - pd.Timedelta(days=now.weekday())
-        end_date = start_date + pd.Timedelta(days=6)
+        start_date = now - pd.Timedelta(days=6)
+        end_date = now
         date_range = pd.date_range(start=start_date, end=end_date, freq='D')
-        x_label = 'Day of Week'
-        date_format = '%a'
+        x_label = 'Day'
+        date_format = '%d %b'
     elif interval == 'D':
         start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_date = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        end_date = now
         date_range = pd.date_range(start=start_date, end=end_date, freq='H')
-        x_label = 'Hour of Day'
+        x_label = 'Hour'
         date_format = '%H:00'
 
-    df_resampled = df.set_index('timestamp').resample(interval)['sentiment_numeric'].mean().reindex(date_range).fillna(0)
+    df_filtered = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
+    df_resampled = df_filtered.set_index('timestamp').resample(interval)['sentiment_numeric'].mean().reindex(date_range).fillna(0)
     df_resampled = df_resampled.reset_index()
 
     plt.figure(figsize=(12, 6))
-    sns.lineplot(data=df_resampled, x='index', y='sentiment_numeric', marker='o')
+    sns.lineplot(data=df_resampled, x='timestamp', y='sentiment_numeric', marker='o')
 
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter(date_format))
     plt.xlabel(x_label)
