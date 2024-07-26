@@ -5,7 +5,27 @@ speech_config = speechsdk.SpeechConfig(subscription=Config.SPEECH_KEY, region=Co
 
 def get_voice_input(audio_stream):
     import logging
-    logging.basicConfig(filename='voice_memory.log', level=logging.DEBUG)
+    import os
+    from logging.handlers import RotatingFileHandler
+
+    log_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'logs')
+    os.makedirs(log_directory, exist_ok=True)
+    log_file = os.path.join(log_directory, 'voice_memory.log')
+
+    logger = logging.getLogger('voice_memory')
+    logger.setLevel(logging.DEBUG)
+
+    file_handler = RotatingFileHandler(log_file, maxBytes=10240, backupCount=10)
+    file_handler.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+
+    if not logger.hasHandlers():
+        logger.addHandler(file_handler)
+    else:
+        logger.handlers.clear()
+        logger.addHandler(file_handler)
     
     logging.info("Starting voice input processing for audio stream")
     try:
