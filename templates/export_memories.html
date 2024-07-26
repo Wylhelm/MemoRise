@@ -13,3 +13,17 @@
     <button type="submit" class="btn btn-primary">Export Memories</button>
 </form>
 {% endblock %}
+
+{% block content %}
+<h1>Export Memories</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="format">Export Format:</label>
+        <select class="form-control" id="format" name="format" required>
+            <option value="csv">CSV</option>
+            <option value="json">JSON</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Export Memories</button>
+</form>
+{% endblock %}
