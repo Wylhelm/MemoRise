@@ -7,16 +7,9 @@
 
 ## Adding a Memory
 
-### Text-based Memory
 1. Click on "Add Memory" in the navigation bar.
 2. Enter your memory in the text area.
 3. Click "Add Memory" to save.
-
-### Voice Memory
-1. On the "Add Memory" page, click "Start Recording".
-2. Speak your memory clearly.
-3. Click "Stop Recording" when finished.
-4. Wait for the system to process and save your memory.
 
 ## Retrieving Memories
 
@@ -64,7 +57,6 @@ These details are automatically generated using advanced NLP techniques to help 
 
 ## Tips for Best Results
 
-- Speak clearly when recording voice memories.
 - Use descriptive keywords when searching for memories.
 - Regularly export your memories for backup purposes.
 

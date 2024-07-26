@@ -8,7 +8,7 @@
   - `routes/`: Route definitions
   - `services/`: Business logic and external service integrations
   - `utils/`: Utility functions
-- `static/`: Static files (JS, CSS)
+- `static/`: Static files (CSS)
 - `templates/`: HTML templates
 - `config.py`: Configuration settings
 - `run.py`: Application entry point
@@ -39,16 +39,11 @@
 
 - Memory service: `app/services/memory_service.py`
 - NLP service: `app/services/nlp_service.py`
-- Speech service: `app/services/speech_service.py`
 
 ## Templates
 
 - Base template: `templates/base.html`
 - Page-specific templates in `templates/`
-
-## Static Files
-
-- Voice recording JS: `static/js/voice_recording.js`
 
 ## Adding New Features
 

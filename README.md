@@ -1,11 +1,10 @@
 # Memory Augmentation App
 
-This is a Flask-based web application that helps users store, retrieve, and manage their memories. It uses advanced Natural Language Processing (NLP) and speech recognition technologies to enhance the user experience.
+This is a Flask-based web application that helps users store, retrieve, and manage their memories. It uses advanced Natural Language Processing (NLP) technologies to enhance the user experience.
 
 ## Features
 
 - Add text-based memories
-- Add voice memories with speech-to-text conversion
 - Retrieve memories with advanced search capabilities
 - Update and delete existing memories
 - Export memories in CSV or JSON format
@@ -19,7 +18,6 @@ This is a Flask-based web application that helps users store, retrieve, and mana
 - Flask
 - SQLAlchemy
 - Azure AI Text Analytics
-- Azure Cognitive Services Speech SDK
 - Bootstrap for responsive design
 
 ## Getting Started
