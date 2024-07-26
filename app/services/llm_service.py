@@ -1,4 +1,5 @@
 import requests
+import json
 
 LM_STUDIO_API_URL = "http://localhost:1234/v1/chat/completions"
 
@@ -36,10 +37,17 @@ def chat_with_memories(query, relevant_memories):
         f"Category: {memory.category}\n"
         f"Sentiment: {memory.sentiment}\n"
         f"Language: {memory.language}\n"
-        f"Key Phrases: {', '.join(memory.key_phrases)}\n"
-        f"Entities: {', '.join([f'{e[0]} ({e[1]})' for e in memory.entities])}\n"
+        f"Key Phrases: {', '.join(json.loads(memory.key_phrases) if isinstance(memory.key_phrases, str) else memory.key_phrases)}\n"
+        f"Entities: {format_entities(memory.entities)}\n"
         for i, memory in enumerate(relevant_memories)
     ])
+
+def format_entities(entities):
+    if isinstance(entities, str):
+        entities = json.loads(entities)
+    if isinstance(entities, list):
+        return ', '.join([f'{e[0]} ({e[1]})' if isinstance(e, (list, tuple)) and len(e) > 1 else str(e) for e in entities])
+    return str(entities)
     prompt = f"Current date and time: {current_time}\n\n" \
              f"Based on the following memories:\n{context}\n\n" \
              f"User query: {query}\n\n" \
