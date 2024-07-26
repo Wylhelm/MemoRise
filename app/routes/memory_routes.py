@@ -21,11 +21,13 @@ def add_voice_memory():
     import io
     logging.basicConfig(filename='voice_memory.log', level=logging.DEBUG)
     
+    logging.info('Received add_voice_memory request')
     data = request.json
     if 'audio' not in data:
         logging.error('No audio data received')
         return jsonify({'success': False, 'message': 'No audio data received', 'status': 'error'})
     
+    logging.info('Decoding audio data')
     audio_data = base64.b64decode(data['audio'])
     audio_stream = io.BytesIO(audio_data)
     
@@ -34,6 +36,7 @@ def add_voice_memory():
         content = get_voice_input(audio_stream)
         logging.info(f'Voice input result: {content}')
         if content:
+            logging.info('Adding memory to database')
             memory_id = add_memory(content)
             logging.info(f'Memory added successfully. ID: {memory_id}, Content: {content[:50]}...')
             return jsonify({'success': True, 'message': f'Memory added successfully! Content: {content[:50]}... ID: {memory_id}', 'status': 'complete'})

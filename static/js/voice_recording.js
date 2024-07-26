@@ -29,12 +29,16 @@ function stopRecording() {
                             $("#recordingStatus").text(response.message);
                         } else {
                             $("#recordingStatus").text("Error: " + response.message);
+                            console.error("Server returned error:", response);
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.error("AJAX Error:", textStatus, errorThrown);
-                        $("#recordingStatus").text("An error occurred while processing voice memory.");
+                        console.error("Response Text:", jqXHR.responseText);
+                        $("#recordingStatus").text("An error occurred while processing voice memory. Check console for details.");
                     }
+                }).done(function() {
+                    console.log("AJAX request completed");
                 });
 
                 // Stop all tracks on the stream to release the microphone
