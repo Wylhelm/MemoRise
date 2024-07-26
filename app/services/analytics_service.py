@@ -43,7 +43,7 @@ def get_sentiment_trends(interval='W'):
     df_resampled = df_resampled.reset_index()
 
     plt.figure(figsize=(12, 6))
-    sns.lineplot(data=df_resampled, x='timestamp', y='sentiment_numeric', marker='o')
+    sns.lineplot(data=df_resampled, x=df_resampled.index, y='sentiment_numeric', marker='o')
 
     # Customize x-axis based on interval
     if interval == 'D':
