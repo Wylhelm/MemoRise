@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from config import Config
 import json
 import logging
+import os
 
 db = SQLAlchemy()
 
@@ -12,7 +13,14 @@ def create_app(config_class=Config):
 
     # Configure logging
     logging.basicConfig(level=logging.DEBUG)
+    file_handler = logging.FileHandler('app.log')
+    file_handler.setLevel(logging.DEBUG)
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.DEBUG)
+
     app.logger.info('Starting the Memory Augmentation App')
+    app.logger.info(f'Template folder: {os.path.abspath(app.template_folder)}')
+    app.logger.info(f'Static folder: {os.path.abspath(app.static_folder)}')
 
     db.init_app(app)
 
@@ -29,7 +37,8 @@ def create_app(config_class=Config):
     def from_json_filter(value):
         try:
             return json.loads(value)
-        except:
+        except Exception as e:
+            app.logger.error(f"Error in from_json_filter: {str(e)}")
             return value
 
     app.logger.info('App initialization complete')
