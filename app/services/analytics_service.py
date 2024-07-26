@@ -27,39 +27,35 @@ def get_sentiment_trends(interval='W'):
     # Filter data based on the interval
     now = pd.Timestamp.now()
     if interval == 'M':
-        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        end_date = now.replace(year=now.year + 1, month=1, day=1) - pd.Timedelta(days=1)
-        df = df[start_date:end_date]
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0) - pd.DateOffset(months=11)
+        end_date = now
+        date_range = pd.date_range(start=start_date, end=end_date, freq='M')
     elif interval == 'W':
-        start_date = now - pd.Timedelta(days=now.weekday())
-        end_date = start_date + pd.Timedelta(days=6)
-        date_range = pd.date_range(start=start_date, end=end_date, freq='D')
-        df_resampled = df.resample('D')['sentiment_numeric'].mean().reindex(date_range).fillna(0)
-        df_resampled = df_resampled.reset_index()
+        start_date = now - pd.Timedelta(days=now.weekday(), weeks=7)
+        end_date = now
+        date_range = pd.date_range(start=start_date, end=end_date, freq='W-MON')
     elif interval == 'D':
-        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_date = start_date + pd.Timedelta(days=1) - pd.Timedelta(microseconds=1)
-        df = df[start_date:end_date]
-        df_resampled = df.resample('H')['sentiment_numeric'].mean().reset_index()
+        start_date = now - pd.Timedelta(days=6)
+        end_date = now
+        date_range = pd.date_range(start=start_date, end=end_date, freq='D')
 
-    # For month view, resample as before
-    if interval == 'M':
-        df_resampled = df.resample(interval)['sentiment_numeric'].mean().reset_index()
+    df_resampled = df.resample(interval)['sentiment_numeric'].mean().reindex(date_range).fillna(0)
+    df_resampled = df_resampled.reset_index()
 
     plt.figure(figsize=(12, 6))
-    sns.lineplot(data=df_resampled, x='index', y='sentiment_numeric', marker='o')
+    sns.lineplot(data=df_resampled, x='timestamp', y='sentiment_numeric', marker='o')
 
     # Customize x-axis based on interval
     if interval == 'D':
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-        plt.gca().xaxis.set_major_locator(mdates.HourLocator())
-        plt.xlabel('Hour')
-    elif interval == 'W':
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%a'))
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
         plt.gca().xaxis.set_major_locator(mdates.DayLocator())
-        plt.xlabel('Day of Week')
+        plt.xlabel('Date')
+    elif interval == 'W':
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        plt.gca().xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
+        plt.xlabel('Week Starting')
     elif interval == 'M':
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
         plt.gca().xaxis.set_major_locator(mdates.MonthLocator())
         plt.xlabel('Month')
 
