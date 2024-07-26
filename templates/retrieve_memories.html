@@ -65,6 +65,8 @@
                         {% for entity in entities %}
                             {% if entity is mapping %}
                                 {{ entity.get('text', '') }} ({{ entity.get('category', '') }}){% if not loop.last %}, {% endif %}
+                            {% elif entity is string %}
+                                {{ entity }}{% if not loop.last %}, {% endif %}
                             {% elif entity is iterable and entity|length >= 2 %}
                                 {{ entity[0] }} ({{ entity[1] }}){% if not loop.last %}, {% endif %}
                             {% else %}
