@@ -5,7 +5,8 @@ bp = Blueprint('analytics', __name__)
 
 @bp.route('/analytics')
 def analytics():
-    sentiment_trends = get_sentiment_trends()
+    interval = request.args.get('interval', 'W')
+    sentiment_trends = get_sentiment_trends(interval)
     memory_insights = get_memory_insights()
     print("Sentiment Trends:", sentiment_trends)  # Debug print
     print("Memory Insights:", memory_insights)  # Debug print
