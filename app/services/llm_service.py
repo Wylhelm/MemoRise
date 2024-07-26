@@ -3,7 +3,7 @@ import json
 
 LM_STUDIO_API_URL = "http://localhost:1234/v1/chat/completions"
 
-def query_local_llm(prompt, max_tokens=100):
+def query_local_llm(prompt):
     """
     Send a query to the local LLM running in LM Studio.
     """
@@ -12,7 +12,7 @@ def query_local_llm(prompt, max_tokens=100):
     }
     data = {
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": max_tokens
+        "max_tokens": 4096  # Set a high value to get the full response
     }
 
     try:
