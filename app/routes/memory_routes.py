@@ -20,14 +20,29 @@ def add_voice_memory():
     import base64
     import io
     import os
+    from logging.handlers import RotatingFileHandler
 
     # Set up logging
-    log_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'logs')
+    log_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'logs')
     os.makedirs(log_directory, exist_ok=True)
     log_file = os.path.join(log_directory, 'voice_memory.log')
-    logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     
-    logging.info('Received add_voice_memory request')
+    # Create a logger
+    logger = logging.getLogger('voice_memory')
+    logger.setLevel(logging.DEBUG)
+
+    # Create a rotating file handler
+    file_handler = RotatingFileHandler(log_file, maxBytes=10240, backupCount=10)
+    file_handler.setLevel(logging.DEBUG)
+
+    # Create a formatter and add it to the handler
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+
+    # Add the handler to the logger
+    logger.addHandler(file_handler)
+
+    logger.info('Received add_voice_memory request')
     data = request.json
     if 'audio' not in data:
         logging.error('No audio data received')
