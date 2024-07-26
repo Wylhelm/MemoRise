@@ -15,6 +15,8 @@ def get_voice_input(audio_stream):
     logger = logging.getLogger('voice_memory')
     logger.setLevel(logging.DEBUG)
 
+    print(f'Log directory: {log_directory}')
+    print(f'Log file: {log_file}')
     logger.info('Log directory: %s', log_directory)
     logger.info('Log file: %s', log_file)
 
@@ -30,8 +32,10 @@ def get_voice_input(audio_stream):
         logger.handlers.clear()
         logger.addHandler(file_handler)
 
+    print(f'Logger setup complete. Log file: {log_file}')
     logger.info('Logger setup complete. Log file: %s', log_file)
     
+    print("Starting voice input processing for audio stream")
     logging.info("Starting voice input processing for audio stream")
     try:
         auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(languages=["en-US", "es-ES", "fr-FR", "de-DE"])
@@ -42,21 +46,28 @@ def get_voice_input(audio_stream):
             audio_config=audio_config
         )
 
+        print("Initiating speech recognition")
         logging.info("Initiating speech recognition")
         result = speech_recognizer.recognize_once_async().get()
+        print(f"Speech recognition result reason: {result.reason}")
         logging.info(f"Speech recognition result reason: {result.reason}")
 
         if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+            print(f"Recognized text: {result.text}")
             logging.info(f"Recognized text: {result.text}")
             return result.text
         elif result.reason == speechsdk.ResultReason.NoMatch:
+            print("No speech could be recognized")
             logging.warning("No speech could be recognized")
         elif result.reason == speechsdk.ResultReason.Canceled:
             cancellation_details = result.cancellation_details
+            print(f"Speech recognition canceled: {cancellation_details.reason}")
             logging.error(f"Speech recognition canceled: {cancellation_details.reason}")
             if cancellation_details.reason == speechsdk.CancellationReason.Error:
+                print(f"Error details: {cancellation_details.error_details}")
                 logging.error(f"Error details: {cancellation_details.error_details}")
     except Exception as e:
+        print(f"Exception during speech recognition: {str(e)}")
         logging.error(f"Exception during speech recognition: {str(e)}", exc_info=True)
 
     return None
