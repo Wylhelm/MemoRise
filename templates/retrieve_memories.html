@@ -68,7 +68,7 @@
                                 {{ entity.get('text', '') }} ({{ entity.get('category', '') }})
                             {% elif entity is string %}
                                 {{ entity }}
-                            {% elif entity is iterable and entity is not str %}
+                            {% elif entity is iterable and entity is not string %}
                                 {% set entity_text = entity[0] if entity else '' %}
                                 {% set entity_category = entity[1] if entity|length > 1 else '' %}
                                 {{ entity_text }}
