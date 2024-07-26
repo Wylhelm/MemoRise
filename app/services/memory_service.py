@@ -8,7 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 def add_memory(content):
-    timestamp = datetime.utcnow()
+    timestamp = datetime.now()  # Use current system time instead of UTC
     category = enhanced_categorize_text(content)
     sentiment, confidence = analyze_sentiment(content)
     entities = recognize_entities(content)
