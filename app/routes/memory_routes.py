@@ -22,6 +22,10 @@ def add_voice_memory():
     import os
     from logging.handlers import RotatingFileHandler
 
+    import logging
+    import os
+    from logging.handlers import RotatingFileHandler
+
     # Set up logging
     log_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'logs')
     os.makedirs(log_directory, exist_ok=True)
@@ -30,21 +34,6 @@ def add_voice_memory():
     # Create a logger
     logger = logging.getLogger('voice_memory')
     logger.setLevel(logging.DEBUG)
-
-    print(f'Log directory: {log_directory}')
-    print(f'Log file: {log_file}')
-    if not os.path.exists(log_directory):
-        print(f'Creating log directory: {log_directory}')
-        os.makedirs(log_directory)
-    if not os.path.exists(log_file):
-        print(f'Creating log file: {log_file}')
-        open(log_file, 'a').close()
-    logger.info('Log directory: %s', log_directory)
-    logger.info('Log file: %s', log_file)
-    print(f'Logger setup complete. Log file: {log_file}')
-    logger.info('Logger setup complete. Log file: %s', log_file)
-    print(f'Logger setup complete. Log file: {log_file}')
-    logger.info('Logger setup complete. Log file: %s', log_file)
 
     # Create a rotating file handler
     file_handler = RotatingFileHandler(log_file, maxBytes=10240, backupCount=10)
@@ -56,14 +45,8 @@ def add_voice_memory():
 
     # Add the handler to the logger
     if not logger.hasHandlers():
-        print('Adding file handler to logger')
-        logger.addHandler(file_handler)
-    else:
-        print('Clearing existing handlers and adding file handler to logger')
-        logger.handlers.clear()
         logger.addHandler(file_handler)
 
-    print(f'Logger setup complete. Log file: {log_file}')
     logger.info('Logger setup complete. Log file: %s', log_file)
 
     print('Received add_voice_memory request')
