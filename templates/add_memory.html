@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add Memory</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="content">Memory Content:</label>
+        <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Memory</button>
+</form>
+<hr>
+<h2>Add Voice Memory</h2>
+<button id="startRecording" class="btn btn-success">Start Recording</button>
+<button id="stopRecording" class="btn btn-danger" style="display: none;">Stop Recording</button>
+<p id="recordingStatus"></p>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        let mediaRecorder;
+        let audioChunks = [];
+
+        $("#startRecording").click(function() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+
+                    $("#startRecording").hide();
+                    $("#stopRecording").show();
+                    $("#recordingStatus").text("Recording...");
+                });
+        });
+
+        $("#stopRecording").click(function() {
+            mediaRecorder.stop();
+            $("#startRecording").show();
+            $("#stopRecording").hide();
+            $("#recordingStatus").text("Processing...");
+
+            mediaRecorder.addEventListener("stop", () => {
+                const audioBlob = new Blob(audioChunks);
+                const formData = new FormData();
+                formData.append("audio", audioBlob, "recording.wav");
+
+                $.ajax({
+                    url: "{{ url_for('add_voice_memory') }}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            $("#recordingStatus").text(response.message);
+                        } else {
+                            $("#recordingStatus").text("Error: " + response.message);
+                        }
+                    },
+                    error: function() {
+                        $("#recordingStatus").text("An error occurred while processing the voice memory.");
+                    }
+                });
+
+                audioChunks = [];
+            });
+        });
+    });
+</script>
+{% endblock %}

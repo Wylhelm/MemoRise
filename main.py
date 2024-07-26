@@ -228,80 +228,72 @@ def get_voice_input():
 
     return None
 
-# Main command-line interface
-def main():
-    setup_database()
-    while True:
-        print("\n1. Add a new memory (text)")
-        print("2. Add a new memory (voice)")
-        print("3. Retrieve memories")
-        print("4. Update a memory")
-        print("5. Delete a memory")
-        print("6. Export memories")
-        print("7. Exit")
-        choice = input("Enter your choice: ")
-        
-        if choice == '1':
-            content = input("Enter your memory: ")
-            memory_id = add_memory(content)
-            print(f"Memory added successfully! ID: {memory_id}")
-        
-        elif choice == '2':
-            content = get_voice_input()
-            if content:
-                memory_id = add_memory(content)
-                print(f"Memory added successfully! ID: {memory_id}")
-        
-        elif choice == '3':
-            keyword = input("Enter a keyword to search (or press enter for all): ")
-            category = input("Enter a category to filter (or press enter for all): ")
-            start_date = input("Enter start date (YYYY-MM-DD) or press enter to skip: ")
-            end_date = input("Enter end date (YYYY-MM-DD) or press enter to skip: ")
-            sentiment = input("Enter sentiment to filter (positive/neutral/negative) or press enter to skip: ")
-            language = input("Enter language to filter or press enter to skip: ")
-        
-            memories = retrieve_memories(keyword, category, start_date, end_date, sentiment, language)
-            if memories:
-                for memory in memories:
-                    print(f"ID: {memory[0]}, [{memory[2]}] {memory[1]}")
-                    print(f"Category: {memory[3]}")
-                    print(f"Sentiment: {memory[4]}")
-                    print(f"Language: {memory[8]} ({memory[9]})")
-                    print(f"Key Phrases: {', '.join(json.loads(memory[7]))}")
-                    print(f"Entities: {', '.join([f'{e[0]} ({e[1]})' for e in json.loads(memory[6])])}")
-                    print("---")
-            else:
-                print("No memories found matching the criteria.")
-    
-        elif choice == '4':
-            memory_id = input("Enter the ID of the memory to update: ")
-            new_content = input("Enter the new content for the memory: ")
-            if update_memory(memory_id, new_content):
-                print("Memory updated successfully!")
-            else:
-                print("Failed to update memory. Please check the ID and try again.")
-    
-        elif choice == '5':
-            memory_id = input("Enter the ID of the memory to delete: ")
-            if delete_memory(memory_id):
-                print("Memory deleted successfully!")
-            else:
-                print("Failed to delete memory. Please check the ID and try again.")
-    
-        elif choice == '6':
-            format = input("Enter export format (csv/json): ").lower()
-            try:
-                filename = export_memories(format)
-                print(f"Memories exported successfully to {filename}")
-            except ValueError as e:
-                print(f"Export failed: {str(e)}")
-    
-        elif choice == '7':
-            print("Thank you for using the Memory Augmentation App. Goodbye!")
-            break
-        
-        else:
-            print("Invalid choice. Please try again.")
+# Remove the main() function and if __name__ == "__main__" block
 
-if __name__ == "__main__":
-    main()
+# Modify the retrieve_memories function to accept an optional memory_id parameter
+def retrieve_memories(keyword=None, category=None, start_date=None, end_date=None, sentiment=None, language=None, memory_id=None):
+    conn = sqlite3.connect('memory.db')
+    c = conn.cursor()
+    
+    query = "SELECT * FROM memories WHERE 1=1"
+    params = []
+    
+    if memory_id:
+        query += " AND id = ?"
+        params.append(memory_id)
+    if keyword:
+        query += " AND content LIKE ?"
+        params.append(f'%{keyword}%')
+    if category:
+        query += " AND category = ?"
+        params.append(category)
+    if start_date:
+        query += " AND timestamp >= ?"
+        params.append(start_date)
+    if end_date:
+        query += " AND timestamp <= ?"
+        params.append(end_date)
+    if sentiment:
+        query += " AND sentiment = ?"
+        params.append(sentiment)
+    if language:
+        query += " AND language = ?"
+        params.append(language)
+    
+    query += " ORDER BY timestamp DESC"
+    
+    c.execute(query, params)
+    memories = c.fetchall()
+    conn.close()
+    return memories
+
+# Modify the export_memories function to return the filename
+def export_memories(format='csv'):
+    memories = retrieve_memories()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    if format == 'csv':
+        filename = f'memories_export_{timestamp}.csv'
+        with open(filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['ID', 'Content', 'Timestamp', 'Category'])
+            for memory in memories:
+                writer.writerow(memory)
+    
+    elif format == 'json':
+        filename = f'memories_export_{timestamp}.json'
+        memories_list = [
+            {
+                'id': memory[0],
+                'content': memory[1],
+                'timestamp': memory[2],
+                'category': memory[3]
+            } for memory in memories
+        ]
+        with open(filename, 'w') as file:
+            json.dump(memories_list, file, indent=2)
+    
+    else:
+        raise ValueError("Unsupported export format. Use 'csv' or 'json'.")
+    
+    return filename
