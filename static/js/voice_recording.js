@@ -39,16 +39,16 @@ $(document).ready(function() {
             $("#recordingStatus").text("Processing...");
 
             mediaRecorder.addEventListener("stop", function() {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                const formData = new FormData();
-                formData.append("audio", audioBlob, "recording.wav");
-
-                $.ajax({
-                    url: "/add_voice_memory",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const reader = new FileReader();
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = function() {
+                    const base64data = reader.result.split(',')[1];
+                    $.ajax({
+                        url: "/add_voice_memory",
+                        type: "POST",
+                        data: JSON.stringify({ audio: base64data }),
+                        contentType: "application/json",
                     success: function(response) {
                         console.log("Server response:", response);
                         if (response.success) {
