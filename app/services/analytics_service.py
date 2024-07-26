@@ -18,10 +18,11 @@ def get_sentiment_trends():
     df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     df = df.set_index('timestamp')
-    df = df.resample('D').agg(lambda x: x.value_counts().index[0] if len(x) > 0 else None)
+    df = df.resample('W').agg(lambda x: x.value_counts().index[0] if len(x) > 0 else None)
 
     plt.figure(figsize=(12, 6))
-    sns.lineplot(data=df, x=df.index, y='sentiment')
+    sns.lineplot(data=df, x=df.index, y='sentiment', marker='o')
+    plt.xticks(df.index, [date.strftime('%A') for date in df.index], rotation=45)
     plt.title('Sentiment Trends Over Time')
     plt.xlabel('Date')
     plt.ylabel('Sentiment')
