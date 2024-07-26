@@ -64,14 +64,17 @@
                     {% elif entities is iterable %}
                         {% for entity in entities %}
                             {% if entity is mapping %}
-                                {{ entity.get('text', '') }} ({{ entity.get('category', '') }}){% if not loop.last %}, {% endif %}
+                                {{ entity.get('text', '') }} ({{ entity.get('category', '') }})
                             {% elif entity is string %}
-                                {{ entity }}{% if not loop.last %}, {% endif %}
-                            {% elif entity is iterable and entity|length >= 2 and not entity is string %}
-                                {{ entity[0] }} ({{ entity[1] }}){% if not loop.last %}, {% endif %}
+                                {{ entity }}
+                            {% elif entity is iterable and not entity is string %}
+                                {% set entity_text = entity[0] if entity|length > 0 else '' %}
+                                {% set entity_category = entity[1] if entity|length > 1 else '' %}
+                                {{ entity_text }} {% if entity_category %}({{ entity_category }}){% endif %}
                             {% else %}
-                                {{ entity }}{% if not loop.last %}, {% endif %}
+                                {{ entity }}
                             {% endif %}
+                            {% if not loop.last %}, {% endif %}
                         {% endfor %}
                     {% else %}
                         Unable to display entities
