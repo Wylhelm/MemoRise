@@ -49,6 +49,7 @@ $(document).ready(function() {
                     processData: false,
                     contentType: false,
                     success: function(response) {
+                        console.log("Server response:", response);
                         if (response.success) {
                             $("#recordingStatus").text(response.message);
                             $("#recordingStatus").removeClass("text-danger").addClass("text-success");
@@ -60,9 +61,21 @@ $(document).ready(function() {
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.error("AJAX Error:", textStatus, errorThrown);
+                        console.error("Response Text:", jqXHR.responseText);
                         $("#recordingStatus").text("An error occurred while processing the voice memory. Please check the console for details.");
                         $("#recordingStatus").removeClass("text-success").addClass("text-danger");
                         audioChunks = [];
+                    },
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function(evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                console.log("Upload progress: " + percentComplete);
+                                $("#recordingStatus").text("Uploading: " + Math.round(percentComplete * 100) + "%");
+                            }
+                       }, false);
+                       return xhr;
                     }
                 });
 
