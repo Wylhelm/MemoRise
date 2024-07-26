@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app.services.memory_service import add_memory, retrieve_memories, update_memory, delete_memory
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from app.services.memory_service import add_memory, retrieve_memories, update_memory, delete_memory, get_relevant_memories
+from app.services.llm_service import chat_with_memories
 
 bp = Blueprint('memory', __name__)
 
@@ -45,3 +46,12 @@ def delete_memory_route(memory_id):
     else:
         flash('Failed to delete memory. Please check the ID and try again.', 'error')
     return redirect(url_for('memory.retrieve_memories_route'))
+
+@bp.route('/chat_with_memories', methods=['GET', 'POST'])
+def chat_with_memories_route():
+    if request.method == 'POST':
+        query = request.form['query']
+        relevant_memories = get_relevant_memories(query)
+        response = chat_with_memories(query, relevant_memories)
+        return jsonify({'response': response})
+    return render_template('chat_with_memories.html')

@@ -4,6 +4,8 @@ from app.services.nlp_service import enhanced_categorize_text, analyze_sentiment
 from datetime import datetime
 import json
 import csv
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 def add_memory(content):
     timestamp = datetime.utcnow()
@@ -102,3 +104,18 @@ def export_memories(format='csv'):
         raise ValueError("Unsupported export format. Use 'csv' or 'json'.")
     
     return filename
+
+def get_relevant_memories(query, top_n=5):
+    """
+    Retrieve the most relevant memories based on the user's query.
+    """
+    memories = Memory.query.all()
+    memory_contents = [memory.content for memory in memories]
+    
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform(memory_contents + [query])
+    
+    cosine_similarities = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1]).flatten()
+    most_similar_indices = cosine_similarities.argsort()[-top_n:][::-1]
+    
+    return [memories[i] for i in most_similar_indices]
