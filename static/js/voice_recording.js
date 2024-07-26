@@ -1,9 +1,50 @@
-$(document).ready(function() {
-    let mediaRecorder;
-    let audioChunks = [];
-    let stream;
-    const maxRecordingTime = 60000; // Maximum recording time of 60 seconds
+let mediaRecorder;
+let audioChunks = [];
+let stream;
+const maxRecordingTime = 60000; // Maximum recording time of 60 seconds
 
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+        $("#startRecording").show();
+        $("#stopRecording").hide();
+        $("#recordingStatus").text("Processing...");
+
+        mediaRecorder.addEventListener("stop", function() {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            reader.onloadend = function() {
+                const base64data = reader.result.split(',')[1];
+                $.ajax({
+                    url: "/add_voice_memory",
+                    type: "POST",
+                    data: JSON.stringify({ audio: base64data }),
+                    contentType: "application/json",
+                    success: function(response) {
+                        console.log("Server response:", response);
+                        if (response.success) {
+                            $("#recordingStatus").text(response.message);
+                        } else {
+                            $("#recordingStatus").text("Error: " + response.message);
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error("AJAX Error:", textStatus, errorThrown);
+                        $("#recordingStatus").text("An error occurred while processing the voice memory.");
+                    }
+                });
+
+                // Stop all tracks on the stream to release the microphone
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+            };
+        });
+    }
+}
+
+$(document).ready(function() {
     $("#startRecording").click(function() {
         audioChunks = []; // Clear audio chunks before starting a new recording
         navigator.mediaDevices.getUserMedia({ audio: true })
@@ -30,44 +71,4 @@ $(document).ready(function() {
     });
 
     $("#stopRecording").click(stopRecording);
-
-    function stopRecording() {
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-            mediaRecorder.stop();
-            $("#startRecording").show();
-            $("#stopRecording").hide();
-            $("#recordingStatus").text("Processing...");
-
-            mediaRecorder.addEventListener("stop", function() {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                const reader = new FileReader();
-                reader.readAsDataURL(audioBlob);
-                reader.onloadend = function() {
-                    const base64data = reader.result.split(',')[1];
-                    $.ajax({
-                        url: "/add_voice_memory",
-                        type: "POST",
-                        data: JSON.stringify({ audio: base64data }),
-                        contentType: "application/json",
-                        success: function(response) {
-                            console.log("Server response:", response);
-                            if (response.success) {
-                            $("#recordingStatus").text(response.message);
-                        } else {
-                            $("#recordingStatus").text("Error: " + response.message);
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error("AJAX Error:", textStatus, errorThrown);
-                        $("#recordingStatus").text("An error occurred while processing the voice memory.");
-                    }
-                });
-
-                // Stop all tracks on the stream to release the microphone
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                }
-            });
-        }
-    }
 });
