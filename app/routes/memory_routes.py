@@ -26,12 +26,13 @@ def add_voice_memory():
     log_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'logs')
     os.makedirs(log_directory, exist_ok=True)
     log_file = os.path.join(log_directory, 'voice_memory.log')
-    logger.info('Log directory: %s', log_directory)
-    logger.info('Log file: %s', log_file)
     
     # Create a logger
     logger = logging.getLogger('voice_memory')
     logger.setLevel(logging.DEBUG)
+
+    logger.info('Log directory: %s', log_directory)
+    logger.info('Log file: %s', log_file)
 
     # Create a rotating file handler
     file_handler = RotatingFileHandler(log_file, maxBytes=10240, backupCount=10)
