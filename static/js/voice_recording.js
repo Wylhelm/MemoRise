@@ -17,7 +17,7 @@ function stopRecording() {
             reader.onloadend = function() {
                 const base64data = reader.result.split(',')[1];
                 
-                // First, send the audio data to initiate processing
+                // Send the audio data for processing
                 $.ajax({
                     url: "/add_voice_memory",
                     type: "POST",
@@ -25,17 +25,15 @@ function stopRecording() {
                     contentType: "application/json",
                     success: function(response) {
                         console.log("Server response:", response);
-                        if (response.status === 'processing') {
-                            $("#recordingStatus").text("Processing audio data...");
-                            // Start polling for processing status
-                            pollProcessingStatus(base64data);
+                        if (response.status === 'complete') {
+                            $("#recordingStatus").text(response.message);
                         } else {
                             $("#recordingStatus").text("Error: " + response.message);
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.error("AJAX Error:", textStatus, errorThrown);
-                        $("#recordingStatus").text("An error occurred while initiating voice memory processing.");
+                        $("#recordingStatus").text("An error occurred while processing voice memory.");
                     }
                 });
 
@@ -46,42 +44,6 @@ function stopRecording() {
             };
         });
     }
-}
-
-function pollProcessingStatus(audioData) {
-    let attempts = 0;
-    const maxAttempts = 15; // Maximum number of polling attempts (30 seconds total)
-
-    function poll() {
-        $.ajax({
-            url: "/process_voice_memory",
-            type: "POST",
-            data: JSON.stringify({ audio: audioData }),
-            contentType: "application/json",
-            success: function(response) {
-                console.log("Processing status:", response);
-                if (response.status === 'complete') {
-                    $("#recordingStatus").text(response.message);
-                } else if (response.status === 'error') {
-                    $("#recordingStatus").text("Error: " + response.message);
-                } else {
-                    attempts++;
-                    if (attempts < maxAttempts) {
-                        $("#recordingStatus").text(response.message + " (Attempt " + attempts + "/" + maxAttempts + ")");
-                        setTimeout(poll, 2000); // Poll every 2 seconds
-                    } else {
-                        $("#recordingStatus").text("Processing timed out. Please try again.");
-                    }
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error("AJAX Error:", textStatus, errorThrown);
-                $("#recordingStatus").text("An error occurred while checking voice memory processing status.");
-            }
-        });
-    }
-
-    poll(); // Start polling
 }
 
 $(document).ready(function() {

@@ -31,28 +31,6 @@ def add_voice_memory():
     
     try:
         logging.info('Processing audio data')
-        return jsonify({'success': False, 'message': 'Processing audio data...', 'status': 'processing'})
-    except Exception as e:
-        logging.error(f"Error in add_voice_memory: {str(e)}", exc_info=True)
-        return jsonify({'success': False, 'message': f'An error occurred: {str(e)}', 'status': 'error'})
-
-@bp.route('/process_voice_memory', methods=['POST'])
-def process_voice_memory():
-    import logging
-    import base64
-    import io
-    logging.basicConfig(filename='voice_memory.log', level=logging.DEBUG)
-    
-    data = request.json
-    if 'audio' not in data:
-        logging.error('No audio data received')
-        return jsonify({'success': False, 'message': 'No audio data received', 'status': 'error'})
-    
-    audio_data = base64.b64decode(data['audio'])
-    audio_stream = io.BytesIO(audio_data)
-    
-    try:
-        logging.info('Processing audio data')
         content = get_voice_input(audio_stream)
         logging.info(f'Voice input result: {content}')
         if content:
@@ -63,8 +41,12 @@ def process_voice_memory():
             logging.warning('Failed to process voice memory. No speech detected.')
             return jsonify({'success': False, 'message': 'Failed to process voice memory. No speech detected.', 'status': 'error'})
     except Exception as e:
-        logging.error(f"Error in process_voice_memory: {str(e)}", exc_info=True)
+        logging.error(f"Error in add_voice_memory: {str(e)}", exc_info=True)
         return jsonify({'success': False, 'message': f'An error occurred: {str(e)}', 'status': 'error'})
+
+@bp.route('/process_voice_memory', methods=['POST'])
+def process_voice_memory():
+    return jsonify({'success': False, 'message': 'This endpoint is no longer used.', 'status': 'error'})
 
 @bp.route('/retrieve_memories', methods=['GET', 'POST'])
 def retrieve_memories_route():
