@@ -17,6 +17,14 @@ def get_voice_input(audio_stream):
 
     print(f'Log directory: {log_directory}')
     print(f'Log file: {log_file}')
+    print(f'Log directory: {log_directory}')
+    print(f'Log file: {log_file}')
+    if not os.path.exists(log_directory):
+        print(f'Creating log directory: {log_directory}')
+        os.makedirs(log_directory)
+    if not os.path.exists(log_file):
+        print(f'Creating log file: {log_file}')
+        open(log_file, 'a').close()
     logger.info('Log directory: %s', log_directory)
     logger.info('Log file: %s', log_file)
 
@@ -27,8 +35,10 @@ def get_voice_input(audio_stream):
     file_handler.setFormatter(formatter)
 
     if not logger.hasHandlers():
+        print('Adding file handler to logger')
         logger.addHandler(file_handler)
     else:
+        print('Clearing existing handlers and adding file handler to logger')
         logger.handlers.clear()
         logger.addHandler(file_handler)
 
