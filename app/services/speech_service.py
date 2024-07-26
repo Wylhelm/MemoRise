@@ -29,6 +29,8 @@ def get_voice_input(audio_stream):
     logger.info('Log file: %s', log_file)
     print(f'Logger setup complete. Log file: {log_file}')
     logger.info('Logger setup complete. Log file: %s', log_file)
+    print(f'Logger setup complete. Log file: {log_file}')
+    logger.info('Logger setup complete. Log file: %s', log_file)
 
     file_handler = RotatingFileHandler(log_file, maxBytes=10240, backupCount=10)
     file_handler.setLevel(logging.DEBUG)

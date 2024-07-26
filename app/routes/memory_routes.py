@@ -43,6 +43,8 @@ def add_voice_memory():
     logger.info('Log file: %s', log_file)
     print(f'Logger setup complete. Log file: {log_file}')
     logger.info('Logger setup complete. Log file: %s', log_file)
+    print(f'Logger setup complete. Log file: {log_file}')
+    logger.info('Logger setup complete. Log file: %s', log_file)
 
     # Create a rotating file handler
     file_handler = RotatingFileHandler(log_file, maxBytes=10240, backupCount=10)
