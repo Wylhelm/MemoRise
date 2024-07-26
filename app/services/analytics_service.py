@@ -18,7 +18,6 @@ def get_sentiment_trends(interval='W'):
 
     df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
     df['timestamp'] = pd.to_datetime(df['timestamp'])
-    df = df.set_index('timestamp')
 
     # Convert sentiment to numeric values
     sentiment_map = {'positive': 1, 'neutral': 0, 'negative': -1}
@@ -45,11 +44,11 @@ def get_sentiment_trends(interval='W'):
         x_label = 'Hour of Day'
         date_format = '%H:00'
 
-    df_resampled = df.resample(interval)['sentiment_numeric'].mean().reindex(date_range).fillna(0)
+    df_resampled = df.set_index('timestamp').resample(interval)['sentiment_numeric'].mean().reindex(date_range).fillna(0)
     df_resampled = df_resampled.reset_index()
 
     plt.figure(figsize=(12, 6))
-    sns.lineplot(data=df_resampled, x='timestamp', y='sentiment_numeric', marker='o')
+    sns.lineplot(data=df_resampled, x='index', y='sentiment_numeric', marker='o')
 
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter(date_format))
     plt.xlabel(x_label)
