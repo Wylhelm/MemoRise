@@ -2,9 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from main import setup_database, add_memory, retrieve_memories, update_memory, delete_memory, export_memories, get_voice_input
 import os
 import json
+import logging
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
 
 @app.template_filter('from_json')
 def from_json(value):
@@ -15,7 +19,13 @@ def from_json(value):
 
 @app.route('/')
 def index():
+    app.logger.info("Rendering index page")
     return render_template('index.html')
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    app.logger.error(f"Internal Server Error: {str(e)}")
+    return "Internal Server Error", 500
 
 @app.route('/add_memory', methods=['GET', 'POST'])
 def add_memory_route():
@@ -110,4 +120,4 @@ def export_memories_route():
 
 if __name__ == '__main__':
     setup_database()
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
