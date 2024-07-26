@@ -5,38 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memory Augmentation App</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+        }
+        .sidebar .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .sidebar .logo img {
+            width: 150px;
+            height: auto;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .nav-link {
+            color: #495057;
+        }
+        .nav-link:hover {
+            background-color: #e9ecef;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Memorise Logo" height="30" class="d-inline-block align-top mr-2">
-            Memorise
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('memory.add_memory_route') }}">Add Memory</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('memory.retrieve_memories_route') }}">Retrieve Memories</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('export.export_memories_route') }}">Export Memories</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('memory.chat_with_memories_route') }}">Chat with Memories</a>
-                </li>
-            </ul>
+    <div class="sidebar">
+        <div class="logo">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Memorise Logo" class="img-fluid">
+            </a>
         </div>
-    </nav>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('memory.add_memory_route') }}">Add Memory</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('memory.retrieve_memories_route') }}">Retrieve Memories</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('export.export_memories_route') }}">Export Memories</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('memory.chat_with_memories_route') }}">Chat with Memories</a>
+            </li>
+        </ul>
+    </div>
 
-    <div class="container mt-4">
+    <div class="content">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
