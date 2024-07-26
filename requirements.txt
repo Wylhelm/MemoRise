@@ -7,3 +7,6 @@ nltk
 scikit-learn
 numpy
 requests
+pandas
+matplotlib
+seaborn

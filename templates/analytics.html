@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Memory Analytics</h1>
+
+<h2>Sentiment Trends</h2>
+<img src="data:image/png;base64,{{ sentiment_trends }}" alt="Sentiment Trends">
+
+<h2>Memory Insights</h2>
+
+<h3>Top Entities</h3>
+<ul>
+{% for entity, count in memory_insights.top_entities.items() %}
+    <li>{{ entity }}: {{ count }}</li>
+{% endfor %}
+</ul>
+
+<h3>Common Themes</h3>
+<ul>
+{% for category, count in memory_insights.top_categories.items() %}
+    <li>{{ category }}: {{ count }}</li>
+{% endfor %}
+</ul>
+
+<h3>Top Key Phrases</h3>
+<ul>
+{% for phrase, count in memory_insights.top_phrases.items() %}
+    <li>{{ phrase }}: {{ count }}</li>
+{% endfor %}
+</ul>
+
+{% endblock %}
