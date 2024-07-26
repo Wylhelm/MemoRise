@@ -57,13 +57,16 @@
                     success: function(response) {
                         if (response.success) {
                             $("#recordingStatus").text(response.message);
+                            $("#recordingStatus").removeClass("text-danger").addClass("text-success");
                         } else {
                             $("#recordingStatus").text("Error: " + response.message);
+                            $("#recordingStatus").removeClass("text-success").addClass("text-danger");
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.error("AJAX Error:", textStatus, errorThrown);
                         $("#recordingStatus").text("An error occurred while processing the voice memory. Please check the console for details.");
+                        $("#recordingStatus").removeClass("text-success").addClass("text-danger");
                     }
                 });
 

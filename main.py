@@ -198,6 +198,12 @@ def export_memories(format='csv'):
 
 # Voice input function with automatic language detection using Azure
 def get_voice_input(audio_file_path):
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    logger.info(f"Processing audio file: {audio_file_path}")
+    
     # Create a speech recognizer with auto language detection (limited to 4 languages)
     auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(languages=["en-US", "es-ES", "fr-FR", "de-DE"])
     audio_config = speechsdk.audio.AudioConfig(filename=audio_file_path)
@@ -207,7 +213,7 @@ def get_voice_input(audio_file_path):
         audio_config=audio_config
     )
 
-    print("Processing audio file...")
+    logger.info("Speech recognizer created, starting recognition...")
     
     # Start speech recognition
     result = speech_recognizer.recognize_once_async().get()
@@ -215,16 +221,16 @@ def get_voice_input(audio_file_path):
     # Check the result
     if result.reason == speechsdk.ResultReason.RecognizedSpeech:
         detected_language = result.properties.get(speechsdk.PropertyId.SpeechServiceConnection_AutoDetectSourceLanguageResult)
-        print(f"Detected language: {detected_language}")
-        print("Transcribed text: " + result.text)
+        logger.info(f"Detected language: {detected_language}")
+        logger.info(f"Transcribed text: {result.text}")
         return result.text
     elif result.reason == speechsdk.ResultReason.NoMatch:
-        print("No speech could be recognized in the audio file")
+        logger.error("No speech could be recognized in the audio file")
     elif result.reason == speechsdk.ResultReason.Canceled:
         cancellation_details = result.cancellation_details
-        print(f"Speech recognition canceled: {cancellation_details.reason}")
+        logger.error(f"Speech recognition canceled: {cancellation_details.reason}")
         if cancellation_details.reason == speechsdk.CancellationReason.Error:
-            print(f"Error details: {cancellation_details.error_details}")
+            logger.error(f"Error details: {cancellation_details.error_details}")
 
     return None
 

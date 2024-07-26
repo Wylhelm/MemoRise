@@ -30,27 +30,38 @@ def add_memory_route():
 def add_voice_memory():
     try:
         if 'audio' not in request.files:
+            app.logger.error("No audio file received")
             return jsonify({'success': False, 'message': 'No audio file received'})
         
         audio_file = request.files['audio']
         if audio_file.filename == '':
+            app.logger.error("No audio file selected")
             return jsonify({'success': False, 'message': 'No audio file selected'})
         
         # Save the audio file temporarily
         temp_filename = 'temp_audio.wav'
         audio_file.save(temp_filename)
+        app.logger.info(f"Audio file saved temporarily as {temp_filename}")
         
         # Process the audio file
         content = get_voice_input(temp_filename)
+        app.logger.info(f"Audio content processed: {content}")
         
         if content:
             memory_id = add_memory(content)
+            app.logger.info(f"Memory added successfully with ID: {memory_id}")
             return jsonify({'success': True, 'message': f'Memory added successfully! ID: {memory_id}'})
         else:
+            app.logger.error("Failed to process voice memory")
             return jsonify({'success': False, 'message': 'Failed to process voice memory'})
     except Exception as e:
         app.logger.error(f"Error in add_voice_memory: {str(e)}")
         return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'})
+    finally:
+        # Clean up the temporary file
+        if os.path.exists(temp_filename):
+            os.remove(temp_filename)
+            app.logger.info(f"Temporary file {temp_filename} removed")
 
 @app.route('/retrieve_memories', methods=['GET', 'POST'])
 def retrieve_memories_route():
