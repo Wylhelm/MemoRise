@@ -1,12 +1,8 @@
 $(document).ready(function() {
     let mediaRecorder;
     let audioChunks = [];
-    let silenceTimer;
-    const silenceThreshold = 2000; // 2 seconds of silence
-    let silenceStart = null;
-    let recordingStartTime;
-    const minRecordingTime = 3000; // Minimum recording time of 3 seconds
     let stream;
+    const maxRecordingTime = 60000; // Maximum recording time of 60 seconds
 
     $("#startRecording").click(function() {
         audioChunks = []; // Clear audio chunks before starting a new recording
@@ -15,44 +11,17 @@ $(document).ready(function() {
                 stream = streamObj;
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.start(1000); // Record in 1-second chunks
-                recordingStartTime = Date.now();
 
-                $("#recordingStatus").text("Recording... (Will stop automatically after 2 seconds of silence)");
+                $("#recordingStatus").text("Recording... (Max 60 seconds)");
+                $("#startRecording").hide();
+                $("#stopRecording").show();
 
                 mediaRecorder.addEventListener("dataavailable", function(event) {
                     audioChunks.push(event.data);
                 });
 
-                $("#startRecording").hide();
-                $("#stopRecording").show();
-
-                // Set up audio analysis for silence detection
-                const audioContext = new AudioContext();
-                const analyser = audioContext.createAnalyser();
-                const microphone = audioContext.createMediaStreamSource(stream);
-                microphone.connect(analyser);
-                analyser.fftSize = 2048;
-                const bufferLength = analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-
-                function checkSilence() {
-                    analyser.getByteFrequencyData(dataArray);
-                    const sum = dataArray.reduce((a, b) => a + b, 0);
-                    const average = sum / bufferLength;
-                    
-                    if (average < 20) { // Increased threshold for better silence detection
-                        if (silenceStart === null) {
-                            silenceStart = Date.now();
-                        } else if (Date.now() - silenceStart >= silenceThreshold && Date.now() - recordingStartTime >= minRecordingTime) {
-                            stopRecording();
-                        }
-                    } else {
-                        silenceStart = null;
-                    }
-                }
-
-                // Start checking for silence
-                silenceTimer = setInterval(checkSilence, 100);
+                // Automatically stop recording after maxRecordingTime
+                setTimeout(stopRecording, maxRecordingTime);
             })
             .catch(error => {
                 console.error("Error accessing microphone:", error);
@@ -64,7 +33,6 @@ $(document).ready(function() {
     function stopRecording() {
         if (mediaRecorder && mediaRecorder.state !== "inactive") {
             mediaRecorder.stop();
-            clearInterval(silenceTimer);
             $("#startRecording").show();
             $("#stopRecording").hide();
             $("#recordingStatus").text("Processing...");

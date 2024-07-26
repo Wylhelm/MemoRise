@@ -30,10 +30,11 @@ def add_voice_memory():
         content = get_voice_input(temp_filename)
         if content:
             memory_id = add_memory(content)
-            return jsonify({'success': True, 'message': f'Memory added successfully! ID: {memory_id}'})
+            return jsonify({'success': True, 'message': f'Memory added successfully! Content: {content[:50]}... ID: {memory_id}'})
         else:
-            return jsonify({'success': False, 'message': 'Failed to process voice memory'})
+            return jsonify({'success': False, 'message': 'Failed to process voice memory. No speech detected.'})
     except Exception as e:
+        print(f"Error in add_voice_memory: {str(e)}")
         return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'})
     finally:
         if os.path.exists(temp_filename):
