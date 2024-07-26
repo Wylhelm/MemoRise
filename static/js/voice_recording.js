@@ -5,6 +5,7 @@ $(document).ready(function() {
     const silenceThreshold = 2000; // 2 seconds of silence
 
     $("#startRecording").click(function() {
+        audioChunks = []; // Clear audio chunks before starting a new recording
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
                 mediaRecorder = new MediaRecorder(stream);
@@ -40,6 +41,36 @@ $(document).ready(function() {
 
                 // Start checking for silence
                 silenceTimer = setInterval(checkSilence, 100);
+
+                mediaRecorder.addEventListener("stop", function() {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append("audio", audioBlob, "recording.wav");
+
+                    $.ajax({
+                        url: "/add_voice_memory",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.success) {
+                                $("#recordingStatus").text(response.message);
+                                $("#recordingStatus").removeClass("text-danger").addClass("text-success");
+                            } else {
+                                $("#recordingStatus").text("Error: " + response.message);
+                                $("#recordingStatus").removeClass("text-success").addClass("text-danger");
+                            }
+                            audioChunks = [];
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.error("AJAX Error:", textStatus, errorThrown);
+                            $("#recordingStatus").text("An error occurred while processing the voice memory. Please check the console for details.");
+                            $("#recordingStatus").removeClass("text-success").addClass("text-danger");
+                            audioChunks = [];
+                        }
+                    });
+                });
             })
             .catch(error => {
                 console.error("Error accessing microphone:", error);
@@ -59,34 +90,4 @@ $(document).ready(function() {
     }
 
     $("#stopRecording").click(stopRecording);
-
-    mediaRecorder.addEventListener("stop", function() {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        const formData = new FormData();
-        formData.append("audio", audioBlob, "recording.wav");
-
-        $.ajax({
-            url: "{{ url_for('memory.add_voice_memory') }}",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.success) {
-                    $("#recordingStatus").text(response.message);
-                    $("#recordingStatus").removeClass("text-danger").addClass("text-success");
-                } else {
-                    $("#recordingStatus").text("Error: " + response.message);
-                    $("#recordingStatus").removeClass("text-success").addClass("text-danger");
-                }
-                audioChunks = [];
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error("AJAX Error:", textStatus, errorThrown);
-                $("#recordingStatus").text("An error occurred while processing the voice memory. Please check the console for details.");
-                $("#recordingStatus").removeClass("text-success").addClass("text-danger");
-                audioChunks = [];
-            }
-        });
-    });
 });
