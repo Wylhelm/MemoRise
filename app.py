@@ -50,19 +50,18 @@ def add_voice_memory():
         if content:
             memory_id = add_memory(content)
             app.logger.info(f"Memory added successfully with ID: {memory_id}")
-            response = jsonify({'success': True, 'message': f'Memory added successfully! ID: {memory_id}'})
+            return jsonify({'success': True, 'message': f'Memory added successfully! ID: {memory_id}'})
         else:
             app.logger.error("Failed to process voice memory")
-            response = jsonify({'success': False, 'message': 'Failed to process voice memory'})
+            return jsonify({'success': False, 'message': 'Failed to process voice memory'})
     except Exception as e:
         app.logger.error(f"Error in add_voice_memory: {str(e)}")
-        response = jsonify({'success': False, 'message': f'An error occurred: {str(e)}'})
+        return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'})
     finally:
         # Clean up the temporary file
         if os.path.exists(temp_filename):
             os.remove(temp_filename)
             app.logger.info(f"Temporary file {temp_filename} removed")
-        return response
 
 @app.route('/retrieve_memories', methods=['GET', 'POST'])
 def retrieve_memories_route():

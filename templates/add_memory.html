@@ -178,16 +178,12 @@
                                 $("#recordingStatus").removeClass("text-success").addClass("text-danger");
                             }
                             audioChunks = []; // Clear audio chunks after processing
-                            $("#startRecording").show();
-                            $("#stopRecording").hide();
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             console.error("AJAX Error:", textStatus, errorThrown);
                             $("#recordingStatus").text("An error occurred while processing the voice memory. Please check the console for details.");
                             $("#recordingStatus").removeClass("text-success").addClass("text-danger");
                             audioChunks = []; // Clear audio chunks after error
-                            $("#startRecording").show();
-                            $("#stopRecording").hide();
                         }
                     });
 
