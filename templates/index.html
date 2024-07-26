@@ -7,6 +7,15 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
+                <h5 class="card-title">Chat with Memories</h5>
+                <p class="card-text">Interact with your memories using natural language.</p>
+                <a href="{{ url_for('memory.chat_with_memories_route') }}" class="btn btn-primary">Chat with Memories</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
                 <h5 class="card-title">Add Memory</h5>
                 <p class="card-text">Add a new memory to your collection.</p>
                 <a href="{{ url_for('memory.add_memory_route') }}" class="btn btn-primary">Add Memory</a>
