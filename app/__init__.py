@@ -33,10 +33,6 @@ def create_app(config_class=Config):
     app.register_blueprint(memory_routes.bp)
     app.register_blueprint(export_routes.bp)
     app.register_blueprint(analytics_routes.bp)
-    app.register_blueprint(main_routes.bp)
-    app.register_blueprint(memory_routes.bp)
-    app.register_blueprint(export_routes.bp)
-    app.register_blueprint(analytics_routes.bp)
 
     @app.template_filter('from_json')
     def from_json_filter(value):
