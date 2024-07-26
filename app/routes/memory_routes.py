@@ -19,7 +19,13 @@ def add_voice_memory():
     import logging
     import base64
     import io
-    logging.basicConfig(filename='voice_memory.log', level=logging.DEBUG)
+    import os
+
+    # Set up logging
+    log_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'logs')
+    os.makedirs(log_directory, exist_ok=True)
+    log_file = os.path.join(log_directory, 'voice_memory.log')
+    logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     
     logging.info('Received add_voice_memory request')
     data = request.json
@@ -37,9 +43,13 @@ def add_voice_memory():
         logging.info(f'Voice input result: {content}')
         if content:
             logging.info('Adding memory to database')
-            memory_id = add_memory(content)
-            logging.info(f'Memory added successfully. ID: {memory_id}, Content: {content[:50]}...')
-            return jsonify({'success': True, 'message': f'Memory added successfully! Content: {content[:50]}... ID: {memory_id}', 'status': 'complete'})
+            try:
+                memory_id = add_memory(content)
+                logging.info(f'Memory added successfully. ID: {memory_id}, Content: {content[:50]}...')
+                return jsonify({'success': True, 'message': f'Memory added successfully! Content: {content[:50]}... ID: {memory_id}', 'status': 'complete'})
+            except Exception as db_error:
+                logging.error(f"Database error in add_memory: {str(db_error)}", exc_info=True)
+                return jsonify({'success': False, 'message': f'Database error: {str(db_error)}', 'status': 'error'})
         else:
             logging.warning('Failed to process voice memory. No speech detected.')
             return jsonify({'success': False, 'message': 'Failed to process voice memory. No speech detected.', 'status': 'error'})

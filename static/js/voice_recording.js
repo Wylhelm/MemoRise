@@ -39,6 +39,9 @@ function stopRecording() {
                     }
                 }).done(function() {
                     console.log("AJAX request completed");
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX request failed:", textStatus, errorThrown);
+                    $("#recordingStatus").text("Failed to send audio data to server. Check console for details.");
                 });
 
                 // Stop all tracks on the stream to release the microphone
