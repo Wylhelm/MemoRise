@@ -1,51 +1,5 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Memory Analytics</h1>
-
-<h2>Sentiment Trends</h2>
-{% if sentiment_trends %}
-    <img src="data:image/png;base64,{{ sentiment_trends }}" alt="Sentiment Trends">
-{% else %}
-    <p>No sentiment data available.</p>
-{% endif %}
-
-<h2>Memory Insights</h2>
-
-<h3>Top Entities</h3>
-{% if memory_insights.top_entities %}
-    <ul>
-    {% for entity, count in memory_insights.top_entities.items() %}
-        <li>{{ entity }}: {{ count }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No entity data available.</p>
-{% endif %}
-
-<h3>Common Themes</h3>
-{% if memory_insights.top_categories %}
-    <ul>
-    {% for category, count in memory_insights.top_categories.items() %}
-        <li>{{ category }}: {{ count }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No category data available.</p>
-{% endif %}
-
-<h3>Top Key Phrases</h3>
-{% if memory_insights.top_phrases %}
-    <ul>
-    {% for phrase, count in memory_insights.top_phrases.items() %}
-        <li>{{ phrase }}: {{ count }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No key phrase data available.</p>
-{% endif %}
-
-{% endblock %}
 
 {% block content %}
 <h1>Memory Analytics</h1>
