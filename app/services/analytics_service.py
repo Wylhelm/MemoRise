@@ -10,7 +10,7 @@ import base64
 from collections import Counter
 import json
 
-def get_sentiment_trends():
+def get_sentiment_trends(interval='W'):
     memories = Memory.query.order_by(Memory.timestamp).all()
     if not memories:
         return None  # Return None if there are no memories
@@ -18,13 +18,19 @@ def get_sentiment_trends():
     df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     df = df.set_index('timestamp')
-    df = df.resample('W').agg(lambda x: x.value_counts().index[0] if len(x) > 0 else None)
+    df = df.resample(interval).agg(lambda x: x.value_counts().index[0] if len(x) > 0 else None)
 
     plt.figure(figsize=(12, 6))
     sns.lineplot(data=df, x=df.index, y='sentiment', marker='o')
-    # Ensure all days of the week are shown on the x-axis
-    all_days = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
-    plt.xticks(all_days, [date.strftime('%A') for date in all_days], rotation=45)
+    if interval == 'D':
+        all_hours = pd.date_range(start=df.index.min(), end=df.index.max(), freq='H')
+        plt.xticks(all_hours, [date.strftime('%H:%M') for date in all_hours], rotation=45)
+    elif interval == 'W':
+        all_days = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
+        plt.xticks(all_days, [date.strftime('%A') for date in all_days], rotation=45)
+    elif interval == 'M':
+        all_dates = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
+        plt.xticks(all_dates, [date.strftime('%d') for date in all_dates], rotation=45)
     plt.title('Sentiment Trends Over Time')
     plt.xlabel('Date')
     plt.ylabel('Sentiment')
