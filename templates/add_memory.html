@@ -60,7 +60,7 @@
                         
                         if (average < 10) { // Adjust this threshold as needed
                             console.log("Silence detected");
-                            resetSilenceTimer();
+                            stopRecording();
                         }
                     }
 
@@ -88,7 +88,7 @@
                 $("#stopRecording").hide();
                 $("#recordingStatus").text("Processing...");
 
-                mediaRecorder.addEventListener("stop", () => {
+                mediaRecorder.addEventListener("stop", function() {
                     console.log("MediaRecorder stopped event triggered");
                     const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                     console.log("Audio blob created, size:", audioBlob.size, "bytes");
@@ -120,7 +120,9 @@
                         }
                     });
 
-                    audioChunks = [];
+                    audioChunks = []; // Clear audio chunks after processing
+                    $("#startRecording").show();
+                    $("#stopRecording").hide();
                 });
             }
         }
