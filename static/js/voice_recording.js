@@ -6,13 +6,15 @@ $(document).ready(function() {
     let silenceStart = null;
     let recordingStartTime;
     const minRecordingTime = 3000; // Minimum recording time of 3 seconds
+    let stream;
 
     $("#startRecording").click(function() {
         audioChunks = []; // Clear audio chunks before starting a new recording
         navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
+            .then(streamObj => {
+                stream = streamObj;
                 mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.start();
+                mediaRecorder.start(1000); // Record in 1-second chunks
                 recordingStartTime = Date.now();
 
                 $("#recordingStatus").text("Recording... (Will stop automatically after 2 seconds of silence)");
@@ -95,6 +97,11 @@ $(document).ready(function() {
                         audioChunks = [];
                     }
                 });
+
+                // Stop all tracks on the stream to release the microphone
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
             });
         }
     }
