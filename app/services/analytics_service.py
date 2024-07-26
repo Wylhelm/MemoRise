@@ -22,7 +22,9 @@ def get_sentiment_trends():
 
     plt.figure(figsize=(12, 6))
     sns.lineplot(data=df, x=df.index, y='sentiment', marker='o')
-    plt.xticks(df.index, [date.strftime('%A') for date in df.index], rotation=45)
+    plt.xticks(pd.date_range(start=df.index.min(), end=df.index.max(), freq='D'), 
+               [date.strftime('%A') for date in pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')], 
+               rotation=45)
     plt.title('Sentiment Trends Over Time')
     plt.xlabel('Date')
     plt.ylabel('Sentiment')
