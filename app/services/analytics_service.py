@@ -27,40 +27,32 @@ def get_sentiment_trends(interval='W'):
     # Filter data based on the interval
     now = pd.Timestamp.now()
     if interval == 'M':
-        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0) - pd.DateOffset(months=11)
-        end_date = now
+        start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        end_date = now.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
         date_range = pd.date_range(start=start_date, end=end_date, freq='M')
+        x_label = 'Month'
+        date_format = '%b'
     elif interval == 'W':
-        start_date = now - pd.Timedelta(days=now.weekday(), weeks=7)
-        end_date = now
-        date_range = pd.date_range(start=start_date, end=end_date, freq='W-MON')
-    elif interval == 'D':
-        start_date = now - pd.Timedelta(days=6)
-        end_date = now
+        start_date = now - pd.Timedelta(days=now.weekday())
+        end_date = start_date + pd.Timedelta(days=6)
         date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+        x_label = 'Day of Week'
+        date_format = '%a'
+    elif interval == 'D':
+        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        date_range = pd.date_range(start=start_date, end=end_date, freq='H')
+        x_label = 'Hour of Day'
+        date_format = '%H:00'
 
     df_resampled = df.resample(interval)['sentiment_numeric'].mean().reindex(date_range).fillna(0)
     df_resampled = df_resampled.reset_index()
 
-    print("df_resampled columns:", df_resampled.columns)
-    print("df_resampled head:", df_resampled.head())
-
     plt.figure(figsize=(12, 6))
-    sns.lineplot(data=df_resampled, x=df_resampled.index, y='sentiment_numeric', marker='o')
+    sns.lineplot(data=df_resampled, x='timestamp', y='sentiment_numeric', marker='o')
 
-    # Customize x-axis based on interval
-    if interval == 'D':
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        plt.gca().xaxis.set_major_locator(mdates.DayLocator())
-        plt.xlabel('Date')
-    elif interval == 'W':
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        plt.gca().xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
-        plt.xlabel('Week Starting')
-    elif interval == 'M':
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-        plt.gca().xaxis.set_major_locator(mdates.MonthLocator())
-        plt.xlabel('Month')
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter(date_format))
+    plt.xlabel(x_label)
 
     plt.xticks(rotation=45)
     plt.title('Sentiment Trends Over Time')
