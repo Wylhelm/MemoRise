@@ -42,12 +42,6 @@ def chat_with_memories(query, relevant_memories):
         for i, memory in enumerate(relevant_memories)
     ])
 
-def format_entities(entities):
-    if isinstance(entities, str):
-        entities = json.loads(entities)
-    if isinstance(entities, list):
-        return ', '.join([f'{e[0]} ({e[1]})' if isinstance(e, (list, tuple)) and len(e) > 1 else str(e) for e in entities])
-    return str(entities)
     prompt = f"Current date and time: {current_time}\n\n" \
              f"Based on the following memories:\n{context}\n\n" \
              f"User query: {query}\n\n" \
@@ -56,3 +50,10 @@ def format_entities(entities):
              f"Response:"
     
     return query_local_llm(prompt)
+
+def format_entities(entities):
+    if isinstance(entities, str):
+        entities = json.loads(entities)
+    if isinstance(entities, list):
+        return ', '.join([f'{e[0]} ({e[1]})' if isinstance(e, (list, tuple)) and len(e) > 1 else str(e) for e in entities])
+    return str(entities)
