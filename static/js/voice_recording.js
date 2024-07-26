@@ -4,6 +4,8 @@ $(document).ready(function() {
     let silenceTimer;
     const silenceThreshold = 2000; // 2 seconds of silence
     let silenceStart = null;
+    let recordingStartTime;
+    const minRecordingTime = 3000; // Minimum recording time of 3 seconds
 
     $("#startRecording").click(function() {
         audioChunks = []; // Clear audio chunks before starting a new recording
@@ -11,6 +13,7 @@ $(document).ready(function() {
             .then(stream => {
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.start();
+                recordingStartTime = Date.now();
 
                 $("#recordingStatus").text("Recording... (Will stop automatically after 2 seconds of silence)");
 
@@ -35,10 +38,10 @@ $(document).ready(function() {
                     const sum = dataArray.reduce((a, b) => a + b, 0);
                     const average = sum / bufferLength;
                     
-                    if (average < 10) { // Adjust this threshold as needed
+                    if (average < 20) { // Increased threshold for better silence detection
                         if (silenceStart === null) {
                             silenceStart = Date.now();
-                        } else if (Date.now() - silenceStart >= silenceThreshold) {
+                        } else if (Date.now() - silenceStart >= silenceThreshold && Date.now() - recordingStartTime >= minRecordingTime) {
                             stopRecording();
                         }
                     } else {
