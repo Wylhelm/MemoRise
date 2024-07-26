@@ -2,12 +2,17 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 import json
+import logging
 
 db = SQLAlchemy()
 
 def create_app(config_class=Config):
     app = Flask(__name__, template_folder='../templates', static_folder='../static')
     app.config.from_object(config_class)
+
+    # Configure logging
+    logging.basicConfig(level=logging.DEBUG)
+    app.logger.info('Starting the Memory Augmentation App')
 
     db.init_app(app)
 
@@ -27,4 +32,5 @@ def create_app(config_class=Config):
         except:
             return value
 
+    app.logger.info('App initialization complete')
     return app
