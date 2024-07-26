@@ -6,6 +6,25 @@
     <title>Memory Augmentation App</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #495057;
+            --sidebar-bg: #f8f9fa;
+            --sidebar-border: #dee2e6;
+            --hover-bg: #e9ecef;
+        }
+        body.dark-mode {
+            --bg-color: #333333;
+            --text-color: #ffffff;
+            --sidebar-bg: #222222;
+            --sidebar-border: #444444;
+            --hover-bg: #444444;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
         .sidebar {
             height: 100vh;
             width: 250px;
@@ -13,8 +32,10 @@
             top: 0;
             left: 0;
             padding-top: 20px;
-            background-color: #f8f9fa;
-            border-right: 1px solid #dee2e6;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
         }
         .sidebar .logo {
             text-align: center;
@@ -29,10 +50,22 @@
             padding: 20px;
         }
         .nav-link {
-            color: #495057;
+            color: var(--text-color);
         }
         .nav-link:hover {
-            background-color: #e9ecef;
+            background-color: var(--hover-bg);
+        }
+        .dark-mode-toggle {
+            margin-top: auto;
+            padding: 10px;
+            text-align: center;
+        }
+        .dark-mode-toggle button {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 5px 10px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -60,6 +93,9 @@
                 <a class="nav-link" href="{{ url_for('export.export_memories_route') }}">Export Memories</a>
             </li>
         </ul>
+        <div class="dark-mode-toggle">
+            <button id="darkModeToggle">Toggle Dark Mode</button>
+        </div>
     </div>
 
     <div class="content">
@@ -77,5 +113,27 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+
+            // Check for saved dark mode preference
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                body.classList.add('dark-mode');
+            }
+
+            darkModeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                
+                // Save dark mode preference
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    localStorage.setItem('darkMode', null);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
