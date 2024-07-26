@@ -1,1 +1,3 @@
 .aider*
+*.db
+__pycache__
