@@ -28,7 +28,8 @@ def add_voice_memory():
 
     # Set up logging
     log_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'logs')
-    os.makedirs(log_directory, exist_ok=True)
+    if not os.path.exists(log_directory):
+        os.makedirs(log_directory)
     log_file = os.path.join(log_directory, 'voice_memory.log')
     
     # Create a logger
