@@ -28,8 +28,11 @@ def add_voice_memory():
         logging.error('No audio file selected')
         return jsonify({'success': False, 'message': 'No audio file selected'})
     
-    temp_filename = 'temp_audio.wav'
-    audio_file.save(temp_filename)
+    import tempfile
+
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+        temp_filename = temp_file.name
+        audio_file.save(temp_filename)
     
     try:
         logging.info(f'Processing audio file: {temp_filename}')
