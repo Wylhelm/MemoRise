@@ -31,7 +31,7 @@ def chat_with_memories(query, relevant_memories):
     """
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     context = "\n".join([
-        f"Memory {i+1}:\n"
+        f"Memory ID: {memory.id}\n"
         f"Content: {memory.content}\n"
         f"Timestamp: {memory.timestamp}\n"
         f"Category: {memory.category}\n"
@@ -39,7 +39,7 @@ def chat_with_memories(query, relevant_memories):
         f"Language: {memory.language}\n"
         f"Key Phrases: {', '.join(json.loads(memory.key_phrases) if isinstance(memory.key_phrases, str) else memory.key_phrases)}\n"
         f"Entities: {format_entities(memory.entities)}\n"
-        for i, memory in enumerate(relevant_memories)
+        for memory in relevant_memories
     ])
 
     prompt = f"Current date and time: {current_time}\n\n" \
