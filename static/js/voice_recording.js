@@ -48,6 +48,7 @@ $(document).ready(function() {
                     data: formData,
                     processData: false,
                     contentType: false,
+                    timeout: 120000, // Set timeout to 2 minutes
                     success: function(response) {
                         console.log("Server response:", response);
                         if (response.success) {
@@ -62,7 +63,12 @@ $(document).ready(function() {
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.error("AJAX Error:", textStatus, errorThrown);
                         console.error("Response Text:", jqXHR.responseText);
-                        $("#recordingStatus").text("An error occurred while processing the voice memory. Please check the console for details.");
+                        let errorMessage = "An error occurred while processing the voice memory. ";
+                        if (textStatus === "timeout") {
+                            errorMessage += "The request timed out. ";
+                        }
+                        errorMessage += "Please check the console for details.";
+                        $("#recordingStatus").text(errorMessage);
                         $("#recordingStatus").removeClass("text-success").addClass("text-danger");
                         audioChunks = [];
                     },

@@ -34,6 +34,7 @@ def add_voice_memory():
     try:
         logging.info(f'Processing audio file: {temp_filename}')
         content = get_voice_input(temp_filename)
+        logging.info(f'Voice input result: {content}')
         if content:
             memory_id = add_memory(content)
             logging.info(f'Memory added successfully. ID: {memory_id}, Content: {content[:50]}...')
