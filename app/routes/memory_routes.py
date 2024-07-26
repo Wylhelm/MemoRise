@@ -40,7 +40,8 @@ def add_voice_memory():
     file_handler.setFormatter(formatter)
 
     # Add the handler to the logger
-    logger.addHandler(file_handler)
+    if not logger.hasHandlers():
+        logger.addHandler(file_handler)
 
     logger.info('Received add_voice_memory request')
     data = request.json
