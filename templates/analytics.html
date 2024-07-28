@@ -24,37 +24,63 @@
 
 <h2>Memory Insights</h2>
 
-<h3>Top Entities</h3>
-{% if memory_insights.top_entities %}
-    <ul>
-    {% for entity, count in memory_insights.top_entities.items() %}
-        <li>{{ entity }}: {{ count }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No entity data available.</p>
-{% endif %}
-
-<h3>Common Themes</h3>
-{% if memory_insights.top_categories %}
-    <ul>
-    {% for category, count in memory_insights.top_categories.items() %}
-        <li>{{ category }}: {{ count }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No category data available.</p>
-{% endif %}
-
-<h3>Top Key Phrases</h3>
-{% if memory_insights.top_phrases %}
-    <ul>
-    {% for phrase, count in memory_insights.top_phrases.items() %}
-        <li>{{ phrase }}: {{ count }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No key phrase data available.</p>
-{% endif %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">Top Entities</h3>
+            </div>
+            <div class="card-body">
+                {% if memory_insights.top_entities %}
+                    <ul class="list-unstyled">
+                    {% for entity, count in memory_insights.top_entities.items() %}
+                        <li>{{ entity }}: {{ count }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No entity data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">Common Themes</h3>
+            </div>
+            <div class="card-body">
+                {% if memory_insights.top_categories %}
+                    <ul class="list-unstyled">
+                    {% for category, count in memory_insights.top_categories.items() %}
+                        <li>{{ category }}: {{ count }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No category data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">Top Key Phrases</h3>
+            </div>
+            <div class="card-body">
+                {% if memory_insights.top_phrases %}
+                    <ul class="list-unstyled">
+                    {% for phrase, count in memory_insights.top_phrases.items() %}
+                        <li>{{ phrase }}: {{ count }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No key phrase data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

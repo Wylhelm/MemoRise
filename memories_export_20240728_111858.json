@@ -1,0 +1,170 @@
+[
+  {
+    "id": 1,
+    "content": "Yesterday I had spaghetti for diner",
+    "timestamp": "2024-07-26T15:19:28.877261",
+    "category": "General",
+    "sentiment": "neutral",
+    "language": "English"
+  },
+  {
+    "id": 2,
+    "content": "The last dream I remember was last week, Saturday if I remember correctly, my dream was about getting lost in an airport, I remember I was not feeling good.",
+    "timestamp": "2024-07-26T15:24:46.846888",
+    "category": "General",
+    "sentiment": "neutral",
+    "language": "English"
+  },
+  {
+    "id": 3,
+    "content": "The last two days, I had difficulty making fires at the chalet",
+    "timestamp": "2024-07-26T15:58:07.262077",
+    "category": "General",
+    "sentiment": "negative",
+    "language": "English"
+  },
+  {
+    "id": 4,
+    "content": "I'm staying at the chalet for 4 days, from July 25 to 28.",
+    "timestamp": "2024-07-26T15:58:56.620296",
+    "category": "General",
+    "sentiment": "neutral",
+    "language": "English"
+  },
+  {
+    "id": 5,
+    "content": "I must pay my sister for the chalet and the meat",
+    "timestamp": "2024-07-26T15:59:42.464430",
+    "category": "Family",
+    "sentiment": "neutral",
+    "language": "English"
+  },
+  {
+    "id": 6,
+    "content": "For lunch I eat chicken pie from St-Hubert",
+    "timestamp": "2024-07-26T16:41:21.666920",
+    "category": "General",
+    "sentiment": "neutral",
+    "language": "English"
+  },
+  {
+    "id": 7,
+    "content": "I like Inessa Sinchougova a lot, I wonder if she will be my girlfriend someday",
+    "timestamp": "2024-07-26T16:44:17.324092",
+    "category": "General",
+    "sentiment": "positive",
+    "language": "English"
+  },
+  {
+    "id": 8,
+    "content": "My accessd password is \"2719\"",
+    "timestamp": "2024-07-26T19:25:07.814432",
+    "category": "General",
+    "sentiment": "neutral",
+    "language": "English"
+  },
+  {
+    "id": 9,
+    "content": "Here is a good pankake recipe I like:Dans un grand bol, m\u00e9langer la farine et la poudre \u00e0 p\u00e2te. R\u00e9server.\r\nDans un autre bol, fouetter les \u0153ufs, le sucre et la vanille 5 minutes au batteur \u00e9lectrique. \u00c0 basse vitesse, ajouter la moiti\u00e9 du lait puis incorporer les ingr\u00e9dients secs. Ajouter le reste du lait et m\u00e9langer jusqu\u2019\u00e0 ce que la p\u00e2te soit homog\u00e8ne. Laisser reposer la p\u00e2te 10 minutes \u00e0 la temp\u00e9rature ambiante.\r\nChauffer une po\u00eale antiadh\u00e9sive \u00e0 feu moyen \u00e0 doux. Lorsque la po\u00eale est chaude, badigeonner de beurre avec un pinceau. Pour chaque pancake, verser environ 75 ml (1/3 tasse) de p\u00e2te au centre de la po\u00eale. Avec le dos d\u2019une cuill\u00e8re, \u00e9taler l\u00e9g\u00e8rement la p\u00e2te.\r\nCuire la pancake de 1 \u00e0 2 minutes de chaque c\u00f4t\u00e9. Elle est pr\u00eate \u00e0 \u00eatre retourn\u00e9e lorsque des bulles apparaissent au centre ou que les rebords commencent \u00e0 cuire. R\u00e9gler la chaleur du feu au besoin pour donner \u00e0 la p\u00e2te le temps de cuire avant qu\u2019elle ne dore trop vite.\r\nR\u00e9server les pancakes au chaud (dans un four pr\u00e9chauff\u00e9 \u00e0 95 \u00b0C / 200 \u00b0F) le temps de toutes les faire ou les servir au fur et \u00e0 mesure de la cuisson. D\u00e9licieux avec du sirop d\u2019\u00e9rable ou de la sauce aux bleuets.",
+    "timestamp": "2024-07-26T19:28:23.951580",
+    "category": "General",
+    "sentiment": "mixed",
+    "language": "French"
+  },
+  {
+    "id": 10,
+    "content": "I did VR at the chalet",
+    "timestamp": "2024-07-26T20:19:10.170595",
+    "category": "General",
+    "sentiment": "neutral",
+    "language": "English"
+  },
+  {
+    "id": 11,
+    "content": "J'ai bu un pepsi aujourd'hui",
+    "timestamp": "2024-07-26T16:24:23.606127",
+    "category": "General",
+    "sentiment": "positive",
+    "language": "French"
+  },
+  {
+    "id": 12,
+    "content": "I really like the chalet, it's a very nice place",
+    "timestamp": "2024-07-26T17:08:54.184649",
+    "category": "General",
+    "sentiment": "positive",
+    "language": "English"
+  },
+  {
+    "id": 13,
+    "content": "Genevieve's cell phone number is 418-922-6181",
+    "timestamp": "2024-07-26T17:09:19.883109",
+    "category": "General",
+    "sentiment": "neutral",
+    "language": "English"
+  },
+  {
+    "id": 14,
+    "content": "I really like my car, it's a Lexus",
+    "timestamp": "2024-07-26T17:09:34.687873",
+    "category": "General",
+    "sentiment": "positive",
+    "language": "English"
+  },
+  {
+    "id": 15,
+    "content": "I like to smoke pot. I know it's a bad habbit but I like it",
+    "timestamp": "2024-07-26T17:09:58.168627",
+    "category": "General",
+    "sentiment": "positive",
+    "language": "English"
+  },
+  {
+    "id": 16,
+    "content": "My parents are awesome",
+    "timestamp": "2024-07-26T17:10:15.979376",
+    "category": "Family",
+    "sentiment": "positive",
+    "language": "English"
+  },
+  {
+    "id": 17,
+    "content": "I love the lake, this place is amazing",
+    "timestamp": "2024-07-26T17:51:36.823411",
+    "category": "General",
+    "sentiment": "positive",
+    "language": "English"
+  },
+  {
+    "id": 18,
+    "content": "I did kayak today, this was a great experience, amazing!",
+    "timestamp": "2024-07-26T17:55:34.310481",
+    "category": "General",
+    "sentiment": "positive",
+    "language": "English"
+  },
+  {
+    "id": 19,
+    "content": "Today was a beautiful sunny day all day long",
+    "timestamp": "2024-07-26T19:01:38.092679",
+    "category": "General",
+    "sentiment": "positive",
+    "language": "English"
+  },
+  {
+    "id": 20,
+    "content": "I will eat spaghetti tonight also",
+    "timestamp": "2024-07-26T19:02:14.975363",
+    "category": "General",
+    "sentiment": "neutral",
+    "language": "English"
+  },
+  {
+    "id": 21,
+    "content": "Aujourd'hui mes parents sont venus au chalet et ont apport\u00e9 du ma\u00efs.",
+    "timestamp": "2024-07-28T10:42:40.685597",
+    "category": "Family",
+    "sentiment": "positive",
+    "language": "French"
+  }
+]
