@@ -11,7 +11,9 @@ logger = logging.getLogger(__name__)
 
 def get_sentiment_trends(interval='W', date=None):
     if date is None:
-        date = datetime.now()
+        date = datetime.now(pytz.UTC)
+    else:
+        date = date.replace(tzinfo=pytz.UTC)
 
     try:
         memories = Memory.query.order_by(Memory.timestamp).all()
@@ -21,7 +23,7 @@ def get_sentiment_trends(interval='W', date=None):
 
         df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
         logger.info(f"Created DataFrame with {len(df)} rows.")
-        df['timestamp'] = pd.to_datetime(df['timestamp'], utc=True).dt.tz_convert(pytz.UTC)
+        df['timestamp'] = pd.to_datetime(df['timestamp'], utc=True)
 
         # Convert sentiment to numeric values
         sentiment_map = {'positive': 1, 'neutral': 0, 'negative': -1}
@@ -29,19 +31,19 @@ def get_sentiment_trends(interval='W', date=None):
 
         # Filter data based on the interval
         if interval == 'M':
-            start_date = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
-            end_date = (start_date + timedelta(days=32)).replace(day=1, tzinfo=pytz.UTC) - timedelta(seconds=1)
+            start_date = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            end_date = (start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
             date_range = pd.date_range(start=start_date, end=end_date, freq='D', tz=pytz.UTC)
             x_label = 'Day'
             date_format = '%d'
         elif interval == 'W':
-            start_date = (date - timedelta(days=date.weekday())).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
+            start_date = (date - timedelta(days=date.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
             end_date = start_date + timedelta(days=7) - timedelta(seconds=1)
             date_range = pd.date_range(start=start_date, end=end_date, freq='D', tz=pytz.UTC)
             x_label = 'Day'
             date_format = '%a'
         elif interval == 'D':
-            start_date = date.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
+            start_date = date.replace(hour=0, minute=0, second=0, microsecond=0)
             end_date = start_date + timedelta(days=1) - timedelta(seconds=1)
             date_range = pd.date_range(start=start_date, end=end_date, freq='H', tz=pytz.UTC)
             x_label = 'Hour'
