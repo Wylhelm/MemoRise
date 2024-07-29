@@ -72,7 +72,7 @@
                                 {% set entity_text = entity[0] if entity else '' %}
                                 {% set entity_category = entity[1] if entity|length > 1 else '' %}
                                 {{ entity_text }}
-                                {%- if entity_category and entity_category != entity_text and entity_category != '' %} ({{ entity_category }}){% endif -%}
+                                {%- if entity_category and entity_category != entity_text and entity_category != '' %} ({{ entity_category }}){% endif %}
                             {% else %}
                                 {{ entity }}
                             {% endif %}
