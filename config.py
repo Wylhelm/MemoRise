@@ -6,5 +6,5 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Azure AI credentials
-    TEXT_ANALYTICS_KEY = "beb426be64af4d5181ecff4801816f72"
-    TEXT_ANALYTICS_ENDPOINT = "https://pylanguage.cognitiveservices.azure.com/"
+    TEXT_ANALYTICS_KEY = "your azure key"
+    TEXT_ANALYTICS_ENDPOINT = "your azure endpoint"
