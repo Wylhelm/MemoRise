@@ -25,9 +25,9 @@ def query_local_llm(prompt):
 
 from datetime import datetime
 
-def chat_with_memories(query, relevant_memories):
+def chat_with_memories(query, relevant_memories, chat_history):
     """
-    Generate a response to the user's query based on relevant memories.
+    Generate a response to the user's query based on relevant memories and chat history.
     """
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     context = "\n".join([
@@ -42,11 +42,14 @@ def chat_with_memories(query, relevant_memories):
         for memory in relevant_memories
     ])
 
+    chat_context = "\n".join([f"{msg['role']}: {msg['content']}" for msg in chat_history])
+
     prompt = f"Current date and time: {current_time}\n\n" \
              f"Based on the following memories:\n{context}\n\n" \
+             f"Previous conversation:\n{chat_context}\n\n" \
              f"User query: {query}\n\n" \
              f"Please consider the timestamps, categories, sentiments, languages, key phrases, " \
-             f"and entities of the memories when formulating your response.\n\n" \
+             f"and entities of the memories, as well as the previous conversation, when formulating your response.\n\n" \
              f"Response:"
     
     return query_local_llm(prompt)
