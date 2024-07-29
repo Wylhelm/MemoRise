@@ -9,7 +9,7 @@ def export_memories_route():
         format = request.form['format']
         try:
             filename = export_memories(format)
-            return send_file(filename, as_attachment=True)
+            return send_file(f'exports/{filename}', as_attachment=True)
         except ValueError as e:
             flash(f'Export failed: {str(e)}', 'error')
     return render_template('export_memories.html')
