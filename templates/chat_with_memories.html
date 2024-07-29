@@ -30,7 +30,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         },
         body: JSON.stringify({
             query: query,
-            chat_history: JSON.stringify(chatHistory)
+            chat_history: chatHistory
         })
     })
     .then(response => response.json())

@@ -51,9 +51,18 @@ def delete_memory_route(memory_id):
 @bp.route('/chat_with_memories', methods=['GET', 'POST'])
 def chat_with_memories_route():
     if request.method == 'POST':
-        query = request.form['query']
-        chat_history = request.form.get('chat_history', '[]')
-        chat_history = json.loads(chat_history)
+        if request.is_json:
+            data = request.get_json()
+            query = data.get('query')
+            chat_history = data.get('chat_history', '[]')
+        else:
+            query = request.form.get('query')
+            chat_history = request.form.get('chat_history', '[]')
+        
+        if not query:
+            return jsonify({'error': 'No query provided'}), 400
+
+        chat_history = json.loads(chat_history) if isinstance(chat_history, str) else chat_history
         relevant_memories = get_relevant_memories(query)
         response = chat_with_memories(query, relevant_memories, chat_history)
         chat_history.append({"role": "user", "content": query})
