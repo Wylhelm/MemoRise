@@ -8,9 +8,9 @@
     <div class="d-flex align-items-center">
         <label for="interval" class="me-2">Select Interval:</label>
         <select class="form-select form-select-sm me-2" id="interval" name="interval" style="width: auto;">
-            <option value="D" {% if interval == "D" %} selected {% endif %}>Day</option>
-            <option value="W" {% if interval == "W" %} selected {% endif %}>Week</option>
-            <option value="M" {% if interval == "M" %} selected {% endif %}>Month</option>
+            <option value="D" {% if interval == 'D' %} selected {% endif %}>Day</option>
+            <option value="W" {% if interval == 'W' %} selected {% endif %}>Week</option>
+            <option value="M" {% if interval == 'M' %} selected {% endif %}>Month</option>
         </select>
         <button id="updateBtn" class="btn btn-success btn-sm">Update</button>
     </div>
