@@ -16,6 +16,25 @@
 <script>
 let chatHistory = [];
 
+function formatResponse(text) {
+    // Handle numbered lists
+    text = text.replace(/^\d+\.\s/gm, '<br>$&');
+    
+    // Handle bullet points
+    text = text.replace(/^[-*]\s/gm, '<br>• ');
+    
+    // Handle bold text
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Handle italic text
+    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Handle line breaks
+    text = text.replace(/\n/g, '<br>');
+    
+    return text;
+}
+
 document.getElementById('chat-form').addEventListener('submit', function(e) {
     e.preventDefault();
     var query = document.getElementById('query').value;
@@ -35,7 +54,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        chatHistoryDiv.innerHTML += '<p><strong>AI:</strong> ' + data.response + '</p>';
+        chatHistoryDiv.innerHTML += '<p><strong>AI:</strong> ' + formatResponse(data.response) + '</p>';
         chatHistory = data.chat_history;
     })
     .catch((error) => {
