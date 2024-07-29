@@ -14,23 +14,29 @@
 </div>
 
 <script>
+let chatHistory = [];
+
 document.getElementById('chat-form').addEventListener('submit', function(e) {
     e.preventDefault();
     var query = document.getElementById('query').value;
-    var chatHistory = document.getElementById('chat-history');
+    var chatHistoryDiv = document.getElementById('chat-history');
     
-    chatHistory.innerHTML += '<p><strong>You:</strong> ' + query + '</p>';
+    chatHistoryDiv.innerHTML += '<p><strong>You:</strong> ' + query + '</p>';
     
     fetch('/chat_with_memories', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
         },
-        body: 'query=' + encodeURIComponent(query)
+        body: JSON.stringify({
+            query: query,
+            chat_history: JSON.stringify(chatHistory)
+        })
     })
     .then(response => response.json())
     .then(data => {
-        chatHistory.innerHTML += '<p><strong>AI:</strong> ' + data.response + '</p>';
+        chatHistoryDiv.innerHTML += '<p><strong>AI:</strong> ' + data.response + '</p>';
+        chatHistory = data.chat_history;
     })
     .catch((error) => {
         console.error('Error:', error);
