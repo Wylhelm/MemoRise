@@ -1,15 +1,21 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from config import Config
+from dotenv import load_dotenv
 import json
 import logging
 import os
 
+load_dotenv()  # Load environment variables from .env file
+
 db = SQLAlchemy()
 
-def create_app(config_class=Config):
+def create_app():
     app = Flask(__name__, template_folder='../templates', static_folder='../static')
-    app.config.from_object(config_class)
+    
+    # Load configuration from environment variables
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS') == 'True'
 
     # Configure logging
     logging.basicConfig(level=logging.DEBUG)
