@@ -46,13 +46,12 @@ def get_sentiment_trends(interval='W', date=None):
             x_label = 'Hour'
             date_format = '%H:00'
 
-        df_filtered = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
-        df_resampled = df_filtered.set_index('timestamp').resample('h')['sentiment_numeric'].mean().reindex(date_range).fillna(0)
-        df_resampled = df_resampled.reset_index()
+        df_filtered = df[(df.index >= start_date) & (df.index <= end_date)]
+        df_resampled = df_filtered['sentiment_numeric'].resample('h').mean().reindex(date_range).fillna(0)
 
         data = {
-            'labels': df_resampled['timestamp'].dt.strftime(date_format).tolist(),
-            'values': df_resampled['sentiment_numeric'].tolist(),
+            'labels': df_resampled.index.strftime(date_format).tolist(),
+            'values': df_resampled.tolist(),
             'start_date': start_date.strftime('%Y-%m-%d'),
             'end_date': end_date.strftime('%Y-%m-%d'),
             'x_label': x_label
