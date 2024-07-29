@@ -51,7 +51,11 @@ def delete_memory_route(memory_id):
 def chat_with_memories_route():
     if request.method == 'POST':
         query = request.form['query']
+        chat_history = request.form.get('chat_history', '[]')
+        chat_history = json.loads(chat_history)
         relevant_memories = get_relevant_memories(query)
-        response = chat_with_memories(query, relevant_memories)
-        return jsonify({'response': response})
+        response = chat_with_memories(query, relevant_memories, chat_history)
+        chat_history.append({"role": "user", "content": query})
+        chat_history.append({"role": "assistant", "content": response})
+        return jsonify({'response': response, 'chat_history': chat_history})
     return render_template('chat_with_memories.html')
