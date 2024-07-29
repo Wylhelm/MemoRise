@@ -4,6 +4,7 @@ from app.services.nlp_service import enhanced_categorize_text, analyze_sentiment
 from datetime import datetime
 import json
 import csv
+import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
