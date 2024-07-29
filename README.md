@@ -1,4 +1,4 @@
-<img src="static/images/logo.png" alt="MemoRise Logo" width="75%">
+<img src="static/images/logo.png" alt="MemoRise Logo" width="25%">
 
 # MemoRise - Memory Augmentation App
 
