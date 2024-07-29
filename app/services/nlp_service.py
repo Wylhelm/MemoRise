@@ -4,12 +4,16 @@ from collections import Counter
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.core.credentials import AzureKeyCredential
 from config import Config
+import os
 
 # Initialize the Azure AI Text Analytics client
 text_analytics_client = TextAnalyticsClient(
     endpoint=Config.TEXT_ANALYTICS_ENDPOINT, 
     credential=AzureKeyCredential(Config.TEXT_ANALYTICS_KEY)
 )
+
+if not Config.TEXT_ANALYTICS_KEY or not Config.TEXT_ANALYTICS_ENDPOINT:
+    raise ValueError("Azure Text Analytics credentials are not set. Please check your .env file.")
 
 def enhanced_categorize_text(text):
     tokens = word_tokenize(text.lower())
