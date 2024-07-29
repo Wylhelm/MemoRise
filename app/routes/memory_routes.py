@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app.services.memory_service import add_memory, retrieve_memories, update_memory, delete_memory, get_relevant_memories
 from app.services.llm_service import chat_with_memories
+import json
 
 bp = Blueprint('memory', __name__)
 
