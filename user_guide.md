@@ -1,4 +1,4 @@
-![MemoRise Logo](static/images/logo.png)
+<img src="static/images/logo.png" alt="MemoRise Logo" width="75%">
 
 # User Guide for MemoRise - Memory Augmentation App
 
