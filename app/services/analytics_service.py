@@ -12,14 +12,15 @@ def get_sentiment_trends(interval='W', date=None):
     if date is None:
         date = datetime.now()
 
-    memories = Memory.query.order_by(Memory.timestamp).all()
-    if not memories:
-        logger.warning("No memories found in the database.")
-        return None  # Return None if there are no memories
+    try:
+        memories = Memory.query.order_by(Memory.timestamp).all()
+        if not memories:
+            logger.warning("No memories found in the database.")
+            return None  # Return None if there are no memories
 
-    df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
-    logger.info(f"Created DataFrame with {len(df)} rows.")
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
+        logger.info(f"Created DataFrame with {len(df)} rows.")
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
 
     # Convert sentiment to numeric values
     sentiment_map = {'positive': 1, 'neutral': 0, 'negative': -1}
@@ -50,7 +51,7 @@ def get_sentiment_trends(interval='W', date=None):
     df_resampled = df_resampled.reset_index()
 
     data = {
-        'labels': df_resampled['timestamp'].dt.strftime(date_format).tolist(),
+        'labels': df_resampled.index.strftime(date_format).tolist(),
         'values': df_resampled['sentiment_numeric'].tolist(),
         'start_date': start_date.strftime('%Y-%m-%d'),
         'end_date': end_date.strftime('%Y-%m-%d'),
@@ -63,6 +64,10 @@ def get_sentiment_trends(interval='W', date=None):
         data['values'] = []
 
     return data
+    
+    except Exception as e:
+        logger.error(f"Error in get_sentiment_trends: {str(e)}")
+        return None
 
 def get_memory_insights():
     memories = Memory.query.all()
