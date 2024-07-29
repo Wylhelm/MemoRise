@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Response, stream_with_context
 from app.services.memory_service import add_memory, retrieve_memories, update_memory, delete_memory, get_relevant_memories
 from app.services.llm_service import chat_with_memories
 import json
@@ -64,8 +64,10 @@ def chat_with_memories_route():
 
         chat_history = json.loads(chat_history) if isinstance(chat_history, str) else chat_history
         relevant_memories = get_relevant_memories(query)
-        response = chat_with_memories(query, relevant_memories, chat_history)
-        chat_history.append({"role": "user", "content": query})
-        chat_history.append({"role": "assistant", "content": response})
-        return jsonify({'response': response, 'chat_history': chat_history})
+
+        def generate():
+            for token in chat_with_memories(query, relevant_memories, chat_history):
+                yield token
+
+        return Response(stream_with_context(generate()), content_type='text/plain')
     return render_template('chat_with_memories.html')

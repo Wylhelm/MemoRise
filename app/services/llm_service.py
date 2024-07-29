@@ -52,7 +52,34 @@ def chat_with_memories(query, relevant_memories, chat_history):
              f"and entities of the memories, as well as the previous conversation, when formulating your response.\n\n" \
              f"Response:"
     
-    return query_local_llm(prompt)
+    return query_local_llm_stream(prompt)
+
+def query_local_llm_stream(prompt):
+    """
+    Send a query to the local LLM running in LM Studio and stream the response.
+    """
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = {
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 4096,
+        "stream": True
+    }
+
+    try:
+        response = requests.post(LM_STUDIO_API_URL, headers=headers, json=data, stream=True)
+        response.raise_for_status()
+        for line in response.iter_lines():
+            if line:
+                json_object = json.loads(line.decode('utf-8').split('data: ')[1])
+                if 'choices' in json_object and len(json_object['choices']) > 0:
+                    content = json_object['choices'][0]['delta'].get('content', '')
+                    if content:
+                        yield content
+    except requests.RequestException as e:
+        print(f"Error querying LLM: {e}")
+        yield "Error: Unable to generate response."
 
 def format_entities(entities):
     if isinstance(entities, str):

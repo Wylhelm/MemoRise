@@ -52,10 +52,29 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
             chat_history: chatHistory
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        chatHistoryDiv.innerHTML += '<p><strong>AI:</strong> ' + formatResponse(data.response) + '</p>';
-        chatHistory = data.chat_history;
+    .then(response => {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let aiResponse = '';
+        let aiResponseElement = document.createElement('p');
+        aiResponseElement.innerHTML = '<strong>AI:</strong> ';
+        chatHistoryDiv.appendChild(aiResponseElement);
+
+        function readStream() {
+            reader.read().then(({ done, value }) => {
+                if (done) {
+                    chatHistory.push({"role": "user", "content": query});
+                    chatHistory.push({"role": "assistant", "content": aiResponse});
+                    return;
+                }
+                const chunk = decoder.decode(value);
+                aiResponse += chunk;
+                aiResponseElement.innerHTML = '<strong>AI:</strong> ' + formatResponse(aiResponse);
+                readStream();
+            });
+        }
+
+        readStream();
     })
     .catch((error) => {
         console.error('Error:', error);
