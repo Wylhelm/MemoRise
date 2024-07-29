@@ -32,7 +32,7 @@ def get_sentiment_trends(interval='W', date=None):
         # Filter data based on the interval
         if interval == 'M':
             start_date = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-            end_date = (start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+            end_date = (start_date + pd.offsets.MonthEnd(1))
             date_range = pd.date_range(start=start_date, end=end_date, freq='D', tz=pytz.UTC)
             x_label = 'Day'
             date_format = '%d'
