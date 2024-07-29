@@ -1,9 +1,11 @@
-# User Guide for Memory Augmentation App
+![MemoRise Logo](static/images/logo.png)
+
+# User Guide for MemoRise - Memory Augmentation App
 
 ## Getting Started
 
-1. Open your web browser and navigate to the application URL.
-2. You'll see the home page with options to add, retrieve, and export memories.
+1. Open your web browser and navigate to the MemoRise application URL.
+2. You'll see the home page with options to add, retrieve, chat with, and analyze your memories.
 
 ## Adding a Memory
 
@@ -35,6 +37,18 @@
 2. Click the "Delete" button next to the memory.
 3. Confirm the deletion when prompted.
 
+## Chatting with Memories
+
+1. Click on "Chat with Memories" in the navigation bar.
+2. Enter your question or prompt in the chat input.
+3. The AI will respond based on your stored memories.
+
+## Analyzing Memories
+
+1. Click on "Analytics" in the navigation bar.
+2. View sentiment trends over time.
+3. Explore insights such as top entities, common themes, and key phrases.
+
 ## Exporting Memories
 
 1. Click on "Export Memories" in the navigation bar.
@@ -57,7 +71,9 @@ These details are automatically generated using advanced NLP techniques to help 
 
 ## Tips for Best Results
 
-- Use descriptive keywords when searching for memories.
-- Regularly export your memories for backup purposes.
+- Use descriptive and detailed content when adding memories.
+- Utilize the chat feature to gain insights from your memories.
+- Regularly check the analytics page to understand trends in your memories.
+- Export your memories periodically for backup purposes.
 
 If you encounter any issues or have questions, please refer to our support documentation or contact our support team.
