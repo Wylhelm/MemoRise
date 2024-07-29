@@ -1,22 +1,17 @@
 from app.models.memory import Memory
 from app import db
 import pandas as pd
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import seaborn as sns
-import io
-import base64
 from collections import Counter
 import json
+from datetime import datetime, timedelta
 
-def get_sentiment_trends(interval='W'):
+def get_sentiment_trends(interval='W', date=None):
+    if date is None:
+        date = datetime.now()
+
     memories = Memory.query.order_by(Memory.timestamp).all()
     if not memories:
         return None  # Return None if there are no memories
-    
-    print(f"Number of memories: {len(memories)}")  # Debug print
 
     df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
     df['timestamp'] = pd.to_datetime(df['timestamp'])
@@ -26,61 +21,38 @@ def get_sentiment_trends(interval='W'):
     df['sentiment_numeric'] = df['sentiment'].map(sentiment_map)
 
     # Filter data based on the interval
-    now = pd.Timestamp.now()
     if interval == 'M':
-        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0) - pd.DateOffset(months=11)
-        end_date = now
-        date_range = pd.date_range(start=start_date, end=end_date, freq='M')
-        x_label = 'Month'
-        date_format = '%b %Y'
-    elif interval == 'W':
-        start_date = now - pd.Timedelta(days=6)
-        end_date = now
+        start_date = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        end_date = (start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
         date_range = pd.date_range(start=start_date, end=end_date, freq='D')
         x_label = 'Day'
-        date_format = '%d %b'
+        date_format = '%d'
+    elif interval == 'W':
+        start_date = date - timedelta(days=date.weekday())
+        end_date = start_date + timedelta(days=6)
+        date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+        x_label = 'Day'
+        date_format = '%a'
     elif interval == 'D':
-        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_date = now
+        start_date = date.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = start_date + timedelta(days=1) - timedelta(seconds=1)
         date_range = pd.date_range(start=start_date, end=end_date, freq='H')
         x_label = 'Hour'
         date_format = '%H:00'
 
     df_filtered = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
-    df_resampled = df_filtered.set_index('timestamp').resample(interval)['sentiment_numeric'].mean().reindex(date_range).fillna(0)
+    df_resampled = df_filtered.set_index('timestamp').resample('H')['sentiment_numeric'].mean().reindex(date_range).fillna(0)
     df_resampled = df_resampled.reset_index()
 
-    print(f"Resampled data shape: {df_resampled.shape}")  # Debug print
-    print(f"Resampled data columns: {df_resampled.columns}")  # Debug print
+    data = {
+        'labels': df_resampled['timestamp'].dt.strftime(date_format).tolist(),
+        'values': df_resampled['sentiment_numeric'].tolist(),
+        'start_date': start_date.strftime('%Y-%m-%d'),
+        'end_date': end_date.strftime('%Y-%m-%d'),
+        'x_label': x_label
+    }
 
-    plt.figure(figsize=(12, 6))
-    plt.plot(df_resampled.index, df_resampled['sentiment_numeric'], marker='o')
-
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter(date_format))
-    plt.xlabel(x_label)
-
-    plt.xticks(rotation=45)
-    plt.title('Sentiment Trends Over Time')
-    plt.ylabel('Average Sentiment')
-    plt.ylim(-1, 1)  # Set y-axis limits
-
-    # Add horizontal lines for sentiment levels
-    plt.axhline(y=0, color='gray', linestyle='--', alpha=0.7)
-    plt.axhline(y=1, color='green', linestyle=':', alpha=0.7)
-    plt.axhline(y=-1, color='red', linestyle=':', alpha=0.7)
-
-    # Add legend
-    plt.text(plt.xlim()[1], 1, 'Positive', verticalalignment='center', horizontalalignment='left', color='green')
-    plt.text(plt.xlim()[1], 0, 'Neutral', verticalalignment='center', horizontalalignment='left', color='gray')
-    plt.text(plt.xlim()[1], -1, 'Negative', verticalalignment='center', horizontalalignment='left', color='red')
-
-    img = io.BytesIO()
-    plt.savefig(img, format='png', bbox_inches='tight')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode()
-
-    plt.close()  # Close the plot to free up memory
-    return plot_url
+    return data
 
 def get_memory_insights():
     memories = Memory.query.all()
