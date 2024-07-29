@@ -1,3 +1,4 @@
+import os
 from app.models.memory import Memory
 from app import db
 from app.services.nlp_service import enhanced_categorize_text, analyze_sentiment, recognize_entities, extract_key_phrases, detect_language
