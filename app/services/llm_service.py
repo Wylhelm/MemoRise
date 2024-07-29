@@ -72,11 +72,18 @@ def query_local_llm_stream(prompt):
         response.raise_for_status()
         for line in response.iter_lines():
             if line:
-                json_object = json.loads(line.decode('utf-8').split('data: ')[1])
-                if 'choices' in json_object and len(json_object['choices']) > 0:
-                    content = json_object['choices'][0]['delta'].get('content', '')
-                    if content:
-                        yield content
+                try:
+                    line_text = line.decode('utf-8')
+                    if line_text.startswith('data: '):
+                        json_str = line_text[6:]  # Remove 'data: ' prefix
+                        json_object = json.loads(json_str)
+                        if 'choices' in json_object and len(json_object['choices']) > 0:
+                            content = json_object['choices'][0]['delta'].get('content', '')
+                            if content:
+                                yield content
+                except json.JSONDecodeError:
+                    print(f"Invalid JSON received: {line_text}")
+                    continue
     except requests.RequestException as e:
         print(f"Error querying LLM: {e}")
         yield "Error: Unable to generate response."
