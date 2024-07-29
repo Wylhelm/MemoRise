@@ -4,6 +4,9 @@ import pandas as pd
 from collections import Counter
 import json
 from datetime import datetime, timedelta
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_sentiment_trends(interval='W', date=None):
     if date is None:
@@ -11,9 +14,11 @@ def get_sentiment_trends(interval='W', date=None):
 
     memories = Memory.query.order_by(Memory.timestamp).all()
     if not memories:
+        logger.warning("No memories found in the database.")
         return None  # Return None if there are no memories
 
     df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
+    logger.info(f"Created DataFrame with {len(df)} rows.")
     df['timestamp'] = pd.to_datetime(df['timestamp'])
 
     # Convert sentiment to numeric values
@@ -51,6 +56,11 @@ def get_sentiment_trends(interval='W', date=None):
         'end_date': end_date.strftime('%Y-%m-%d'),
         'x_label': x_label
     }
+
+    # Add error handling
+    if df_resampled.empty:
+        data['labels'] = []
+        data['values'] = []
 
     return data
 
