@@ -1,5 +1,4 @@
 .aider*
 *.db
-__pycache__
 *.pyc
 *.log
