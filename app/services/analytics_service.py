@@ -3,7 +3,7 @@ from app import db
 import pandas as pd
 from collections import Counter
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ def get_sentiment_trends(interval='W', date=None):
 
         df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
         logger.info(f"Created DataFrame with {len(df)} rows.")
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize(timezone.utc).dt.tz_convert(None)
 
         # Convert sentiment to numeric values
         sentiment_map = {'positive': 1, 'neutral': 0, 'negative': -1}
@@ -40,8 +40,8 @@ def get_sentiment_trends(interval='W', date=None):
             x_label = 'Day'
             date_format = '%a'
         elif interval == 'D':
-            start_date = date.replace(hour=0, minute=0, second=0, microsecond=0)
-            end_date = start_date + timedelta(days=1)
+            start_date = date.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
+            end_date = (start_date + timedelta(days=1)).replace(tzinfo=timezone.utc)
             date_range = pd.date_range(start=start_date, end=end_date, freq='H')
             x_label = 'Hour'
             date_format = '%H:00'
