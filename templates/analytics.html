@@ -140,11 +140,11 @@ function updateDateRange(start, end) {
     const interval = document.getElementById('interval').value;
     
     if (interval === 'D') {
-        dateRange.textContent = new Date(start).toLocaleDateString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        dateRange.textContent = new Date(start).toLocaleDateString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
     } else if (interval === 'W') {
-        dateRange.textContent = `${new Date(start).toLocaleDateString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} - ${new Date(end).toLocaleDateString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+        dateRange.textContent = `${new Date(start).toLocaleDateString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })} - ${new Date(end).toLocaleDateString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}`;
     } else if (interval === 'M') {
-        dateRange.textContent = new Date(start).toLocaleDateString('default', { month: 'long', year: 'numeric' });
+        dateRange.textContent = new Date(start).toLocaleDateString('default', { month: 'long', year: 'numeric', timeZone: 'UTC' });
     }
 }
 
