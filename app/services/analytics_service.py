@@ -41,7 +41,7 @@ def get_sentiment_trends(interval='W', date=None):
             date_format = '%a'
         elif interval == 'D':
             start_date = date.replace(hour=0, minute=0, second=0, microsecond=0)
-            end_date = start_date + timedelta(days=1)
+            end_date = start_date + timedelta(days=1) - timedelta(seconds=1)
             date_range = pd.date_range(start=start_date, end=end_date, freq='h')
             x_label = 'Hour'
             date_format = '%H:00'
