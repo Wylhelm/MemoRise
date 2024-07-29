@@ -107,7 +107,7 @@ def export_memories(format='csv'):
     else:
         raise ValueError("Unsupported export format. Use 'csv' or 'json'.")
     
-    return filename
+    return os.path.basename(filename)
 
 def get_relevant_memories(query, top_n=5):
     """
