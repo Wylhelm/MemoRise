@@ -51,7 +51,7 @@ def get_sentiment_trends(interval='W', date=None):
         df_resampled = df_resampled.reset_index()
 
         data = {
-            'labels': df_resampled.index.strftime(date_format).tolist(),
+            'labels': df_resampled['timestamp'].dt.strftime(date_format).tolist(),
             'values': df_resampled['sentiment_numeric'].tolist(),
             'start_date': start_date.strftime('%Y-%m-%d'),
             'end_date': end_date.strftime('%Y-%m-%d'),
