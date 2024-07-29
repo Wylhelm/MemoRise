@@ -77,8 +77,11 @@ def export_memories(format='csv'):
     memories = Memory.query.all()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
+    export_dir = 'exports'
+    os.makedirs(export_dir, exist_ok=True)
+    
     if format == 'csv':
-        filename = f'memories_export_{timestamp}.csv'
+        filename = os.path.join(export_dir, f'memories_export_{timestamp}.csv')
         with open(filename, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(['ID', 'Content', 'Timestamp', 'Category', 'Sentiment', 'Language'])
@@ -86,7 +89,7 @@ def export_memories(format='csv'):
                 writer.writerow([memory.id, memory.content, memory.timestamp, memory.category, memory.sentiment, memory.language])
     
     elif format == 'json':
-        filename = f'memories_export_{timestamp}.json'
+        filename = os.path.join(export_dir, f'memories_export_{timestamp}.json')
         memories_list = [
             {
                 'id': memory.id,
