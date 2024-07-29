@@ -4,6 +4,7 @@ import pandas as pd
 from collections import Counter
 import json
 from datetime import datetime, timedelta, timezone
+import pytz
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ def get_sentiment_trends(interval='W', date=None):
 
         df = pd.DataFrame([(m.timestamp, m.sentiment) for m in memories], columns=['timestamp', 'sentiment'])
         logger.info(f"Created DataFrame with {len(df)} rows.")
-        df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_localize(timezone.utc).dt.tz_convert(None)
+        df['timestamp'] = pd.to_datetime(df['timestamp'], utc=True).dt.tz_convert(pytz.UTC)
 
         # Convert sentiment to numeric values
         sentiment_map = {'positive': 1, 'neutral': 0, 'negative': -1}
@@ -28,26 +29,26 @@ def get_sentiment_trends(interval='W', date=None):
 
         # Filter data based on the interval
         if interval == 'M':
-            start_date = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-            end_date = (start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
-            date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+            start_date = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
+            end_date = (start_date + timedelta(days=32)).replace(day=1, tzinfo=pytz.UTC) - timedelta(seconds=1)
+            date_range = pd.date_range(start=start_date, end=end_date, freq='D', tz=pytz.UTC)
             x_label = 'Day'
             date_format = '%d'
         elif interval == 'W':
-            start_date = date - timedelta(days=date.weekday())
-            end_date = start_date + timedelta(days=6)
-            date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+            start_date = (date - timedelta(days=date.weekday())).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
+            end_date = start_date + timedelta(days=7) - timedelta(seconds=1)
+            date_range = pd.date_range(start=start_date, end=end_date, freq='D', tz=pytz.UTC)
             x_label = 'Day'
             date_format = '%a'
         elif interval == 'D':
-            start_date = date.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
-            end_date = (start_date + timedelta(days=1)).replace(tzinfo=timezone.utc)
-            date_range = pd.date_range(start=start_date, end=end_date, freq='H')
+            start_date = date.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
+            end_date = start_date + timedelta(days=1) - timedelta(seconds=1)
+            date_range = pd.date_range(start=start_date, end=end_date, freq='H', tz=pytz.UTC)
             x_label = 'Hour'
             date_format = '%H:00'
 
         df_filtered = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
-        df_resampled = df_filtered.set_index('timestamp')['sentiment_numeric'].resample('H').mean().reindex(date_range).fillna(0)
+        df_resampled = df_filtered.set_index('timestamp')['sentiment_numeric'].resample(date_range.freq).mean().reindex(date_range).fillna(0)
 
         data = {
             'labels': df_resampled.index.strftime(date_format).tolist(),
