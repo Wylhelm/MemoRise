@@ -48,8 +48,11 @@ def chat_with_memories(query, relevant_memories, chat_history):
              f"Based on the following memories:\n{context}\n\n" \
              f"Previous conversation:\n{chat_context}\n\n" \
              f"User query: {query}\n\n" \
-             f"Please consider the timestamps, categories, sentiments, languages, key phrases, " \
-             f"and entities of the memories, as well as the previous conversation, when formulating your response.\n\n" \
+             f"Please consider the following instructions when formulating your response:\n" \
+             f"1. Ignore deictic expressions (such as 'yesterday', 'last week', 'tomorrow') in the memories.\n" \
+             f"2. Use only the explicit timestamps provided with each memory for temporal context.\n" \
+             f"3. Consider the categories, sentiments, languages, key phrases, and entities of the memories.\n" \
+             f"4. Take into account the previous conversation for context.\n\n" \
              f"Response:"
     
     return query_local_llm_stream(prompt)
