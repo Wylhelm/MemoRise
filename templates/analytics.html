@@ -140,9 +140,9 @@ function updateDateRange(start, end) {
     const interval = document.getElementById('interval').value;
     
     if (interval === 'D') {
-        dateRange.textContent = new Date(start).toLocaleDateString();
+        dateRange.textContent = new Date(start).toLocaleDateString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     } else if (interval === 'W') {
-        dateRange.textContent = `${new Date(start).toLocaleDateString()} - ${new Date(end).toLocaleDateString()}`;
+        dateRange.textContent = `${new Date(start).toLocaleDateString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} - ${new Date(end).toLocaleDateString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
     } else if (interval === 'M') {
         dateRange.textContent = new Date(start).toLocaleDateString('default', { month: 'long', year: 'numeric' });
     }
