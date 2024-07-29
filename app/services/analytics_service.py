@@ -22,49 +22,49 @@ def get_sentiment_trends(interval='W', date=None):
         logger.info(f"Created DataFrame with {len(df)} rows.")
         df['timestamp'] = pd.to_datetime(df['timestamp'])
 
-    # Convert sentiment to numeric values
-    sentiment_map = {'positive': 1, 'neutral': 0, 'negative': -1}
-    df['sentiment_numeric'] = df['sentiment'].map(sentiment_map)
+        # Convert sentiment to numeric values
+        sentiment_map = {'positive': 1, 'neutral': 0, 'negative': -1}
+        df['sentiment_numeric'] = df['sentiment'].map(sentiment_map)
 
-    # Filter data based on the interval
-    if interval == 'M':
-        start_date = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        end_date = (start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
-        date_range = pd.date_range(start=start_date, end=end_date, freq='D')
-        x_label = 'Day'
-        date_format = '%d'
-    elif interval == 'W':
-        start_date = date - timedelta(days=date.weekday())
-        end_date = start_date + timedelta(days=6)
-        date_range = pd.date_range(start=start_date, end=end_date, freq='D')
-        x_label = 'Day'
-        date_format = '%a'
-    elif interval == 'D':
-        start_date = date.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_date = start_date + timedelta(days=1) - timedelta(seconds=1)
-        date_range = pd.date_range(start=start_date, end=end_date, freq='H')
-        x_label = 'Hour'
-        date_format = '%H:00'
+        # Filter data based on the interval
+        if interval == 'M':
+            start_date = date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            end_date = (start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+            date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+            x_label = 'Day'
+            date_format = '%d'
+        elif interval == 'W':
+            start_date = date - timedelta(days=date.weekday())
+            end_date = start_date + timedelta(days=6)
+            date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+            x_label = 'Day'
+            date_format = '%a'
+        elif interval == 'D':
+            start_date = date.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = start_date + timedelta(days=1) - timedelta(seconds=1)
+            date_range = pd.date_range(start=start_date, end=end_date, freq='H')
+            x_label = 'Hour'
+            date_format = '%H:00'
 
-    df_filtered = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
-    df_resampled = df_filtered.set_index('timestamp').resample('H')['sentiment_numeric'].mean().reindex(date_range).fillna(0)
-    df_resampled = df_resampled.reset_index()
+        df_filtered = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
+        df_resampled = df_filtered.set_index('timestamp').resample('H')['sentiment_numeric'].mean().reindex(date_range).fillna(0)
+        df_resampled = df_resampled.reset_index()
 
-    data = {
-        'labels': df_resampled.index.strftime(date_format).tolist(),
-        'values': df_resampled['sentiment_numeric'].tolist(),
-        'start_date': start_date.strftime('%Y-%m-%d'),
-        'end_date': end_date.strftime('%Y-%m-%d'),
-        'x_label': x_label
-    }
+        data = {
+            'labels': df_resampled.index.strftime(date_format).tolist(),
+            'values': df_resampled['sentiment_numeric'].tolist(),
+            'start_date': start_date.strftime('%Y-%m-%d'),
+            'end_date': end_date.strftime('%Y-%m-%d'),
+            'x_label': x_label
+        }
 
-    # Add error handling
-    if df_resampled.empty:
-        data['labels'] = []
-        data['values'] = []
+        # Add error handling
+        if df_resampled.empty:
+            data['labels'] = []
+            data['values'] = []
 
-    return data
-    
+        return data
+
     except Exception as e:
         logger.error(f"Error in get_sentiment_trends: {str(e)}")
         return None
