@@ -78,7 +78,7 @@ def export_memories(format='csv'):
     memories = Memory.query.all()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    export_dir = 'exports'
+    export_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'exports')
     os.makedirs(export_dir, exist_ok=True)
     
     if format == 'csv':
@@ -107,7 +107,7 @@ def export_memories(format='csv'):
     else:
         raise ValueError("Unsupported export format. Use 'csv' or 'json'.")
     
-    return os.path.basename(filename)
+    return filename
 
 def get_relevant_memories(query, top_n=5):
     """
