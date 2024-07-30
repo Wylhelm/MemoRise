@@ -1,0 +1,6 @@
+.aider*
+.env
+*.db
+*.pyc
+*.log
+config.py
